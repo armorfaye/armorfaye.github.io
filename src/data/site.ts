@@ -17,6 +17,7 @@ export const site = {
   email: 'jerryliu200710@gmail.com',
   // Resume lives in public/docs — swap the file, keep the path.
   resume: '/docs/Jerry_Liu_Resume.pdf',
+  profile: '/images/profile.png',
 } as const;
 
 export const socials = {
