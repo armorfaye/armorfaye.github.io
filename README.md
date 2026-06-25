@@ -25,7 +25,7 @@ writing, and documents, and deploys for free to GitHub Pages at
 
 ## Getting started
 
-Requires Node.js 20+.
+Requires Node.js 22.12+ (Astro 7 requirement).
 
 ```bash
 npm install      # install dependencies
