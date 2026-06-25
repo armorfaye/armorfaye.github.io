@@ -1,0 +1,55 @@
+---
+import Icon from './Icon.astro';
+import type { ExperienceEntry } from '../data/experience';
+
+interface Props {
+  entry: ExperienceEntry;
+}
+const { entry } = Astro.props;
+---
+
+<li class="relative pl-8">
+  <!-- Timeline node + connecting line. -->
+  <span
+    class="absolute left-0 top-1.5 flex h-3.5 w-3.5 items-center justify-center"
+    aria-hidden="true"
+  >
+    <span class="h-3 w-3 rounded-full border-2 border-accent-500 bg-stone-50 dark:bg-stone-950"></span>
+  </span>
+
+  <div class="flex flex-col justify-between gap-1 sm:flex-row sm:items-baseline sm:gap-4">
+    <h3 class="font-semibold text-stone-900 dark:text-stone-100">
+      {entry.org}
+    </h3>
+    {entry.dates && <span class="shrink-0 text-sm text-stone-500 dark:text-stone-500">{entry.dates}</span>}
+  </div>
+
+  <p class="text-sm text-accent-700 dark:text-accent-400">
+    {entry.role}{entry.location && <span class="text-stone-500 dark:text-stone-500"> &middot; {entry.location}</span>}
+  </p>
+
+  {
+    entry.bullets.length > 0 && (
+      <ul class="mt-2 space-y-1 text-sm leading-relaxed text-stone-600 dark:text-stone-400">
+        {entry.bullets.map((b) => (
+          <li class="relative pl-4 before:absolute before:left-0 before:top-2.5 before:h-1 before:w-1 before:rounded-full before:bg-stone-400">
+            {b}
+          </li>
+        ))}
+      </ul>
+    )
+  }
+
+  {
+    entry.link && (
+      <a
+        href={entry.link.url}
+        target={entry.link.url.startsWith('http') ? '_blank' : undefined}
+        rel={entry.link.url.startsWith('http') ? 'noopener noreferrer' : undefined}
+        class="mt-2 inline-flex items-center gap-1 text-sm font-medium text-accent-700 hover:text-accent-500 dark:text-accent-400"
+      >
+        {entry.link.label} <Icon name="external" class="h-3.5 w-3.5" />
+      </a>
+    )
+  }
+</li>

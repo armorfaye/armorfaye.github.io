@@ -1,0 +1,121 @@
+@import 'tailwindcss';
+
+/* Bundled webfonts (self-hosted via @fontsource, no external requests). */
+@import '@fontsource/instrument-serif/400.css';
+@import '@fontsource/instrument-serif/400-italic.css';
+@import '@fontsource/ibm-plex-sans/400.css';
+@import '@fontsource/ibm-plex-sans/500.css';
+@import '@fontsource/ibm-plex-sans/600.css';
+@import '@fontsource/ibm-plex-sans/700.css';
+@import '@fontsource/jetbrains-mono/400.css';
+@import '@fontsource/jetbrains-mono/500.css';
+
+/* Enable class-based dark mode (Tailwind v4 toggles via a `.dark` ancestor). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'Instrument Serif', ui-serif, Georgia, serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+
+  /* Accent: teal/cyan. */
+  --color-accent-50: #ecfeff;
+  --color-accent-100: #cffafe;
+  --color-accent-200: #a5f3fc;
+  --color-accent-300: #67e8f9;
+  --color-accent-400: #22d3ee;
+  --color-accent-500: #06b6d4;
+  --color-accent-600: #0891b2;
+  --color-accent-700: #0e7490;
+  --color-accent-800: #155e75;
+  --color-accent-900: #164e63;
+}
+
+/* Smooth color transitions when the theme flips, but never fight motion prefs. */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-stone-50 text-stone-800 antialiased;
+    @apply dark:bg-stone-950 dark:text-stone-200;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-accent-500;
+  }
+
+  ::selection {
+    @apply bg-accent-200 text-stone-900;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Shared utility for in-view reveal animation (used sparingly). */
+@layer utilities {
+  .reveal {
+    opacity: 0;
+    transform: translateY(12px);
+    transition:
+      opacity 0.5s ease,
+      transform 0.5s ease;
+  }
+
+  .reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Typographic defaults for rendered MDX (project bodies). */
+.prose-portfolio {
+  @apply text-stone-700 dark:text-stone-300 leading-relaxed;
+}
+.prose-portfolio h2 {
+  @apply font-serif text-2xl sm:text-3xl text-stone-900 dark:text-stone-100 mt-12 mb-4;
+}
+.prose-portfolio h3 {
+  @apply font-semibold text-lg text-stone-900 dark:text-stone-100 mt-8 mb-3;
+}
+.prose-portfolio p {
+  @apply my-4;
+}
+.prose-portfolio ul {
+  @apply my-4 space-y-2 list-disc pl-5 marker:text-accent-500;
+}
+.prose-portfolio ol {
+  @apply my-4 space-y-2 list-decimal pl-5 marker:text-accent-500;
+}
+.prose-portfolio a {
+  @apply text-accent-700 dark:text-accent-400 underline underline-offset-2 hover:text-accent-500;
+}
+.prose-portfolio code {
+  @apply font-mono text-sm bg-stone-200/70 dark:bg-stone-800 px-1.5 py-0.5 rounded;
+}
+.prose-portfolio pre {
+  @apply my-6 rounded-lg p-4 overflow-x-auto text-sm;
+}
+.prose-portfolio pre code {
+  @apply bg-transparent p-0;
+}
+.prose-portfolio strong {
+  @apply text-stone-900 dark:text-stone-100 font-semibold;
+}
+.prose-portfolio blockquote {
+  @apply border-l-2 border-accent-400 pl-4 italic text-stone-600 dark:text-stone-400 my-6;
+}

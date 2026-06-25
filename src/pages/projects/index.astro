@@ -1,0 +1,111 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import { categories } from '../../data/categories';
+
+const projects = (await getCollection('projects')).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+
+const filters = [{ id: 'all', label: 'All' }, ...categories];
+---
+
+<BaseLayout
+  title="Projects"
+  description="Research and engineering projects spanning AI, assistive technology, mathematics, and systems."
+>
+  <div class="mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-16">
+    <SectionHeader
+      eyebrow="Portfolio"
+      title="Projects"
+      subtitle="Research and engineering work across AI/ML, assistive technology, mathematics, and systems. Filter by area below."
+    />
+
+    <!-- Category filter -->
+    <div class="mb-8 flex flex-wrap gap-2" role="group" aria-label="Filter projects by category">
+      {
+        filters.map((f, i) => (
+          <button
+            type="button"
+            data-filter={f.id}
+            aria-pressed={i === 0 ? 'true' : 'false'}
+            class:list={[
+              'filter-btn rounded-full px-4 py-1.5 text-sm font-medium ring-1 ring-inset transition-colors',
+              i === 0
+                ? 'bg-accent-600 text-white ring-accent-600'
+                : 'text-stone-600 ring-stone-300/70 hover:bg-stone-200/60 dark:text-stone-400 dark:ring-stone-700 dark:hover:bg-stone-800',
+            ]}
+          >
+            {f.label}
+          </button>
+        ))
+      }
+    </div>
+
+    <div id="project-grid" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {
+        projects.map((p) => (
+          <div class="project-item" data-categories={p.data.categories.join(' ')}>
+            <ProjectCard
+              slug={p.id}
+              title={p.data.title}
+              summary={p.data.summary}
+              categories={p.data.categories}
+              tags={p.data.tags}
+              role={p.data.role}
+              dates={p.data.dates}
+              thumbnail={p.data.thumbnail}
+              links={p.data.links}
+            />
+          </div>
+        ))
+      }
+    </div>
+
+    <p id="empty-state" class="hidden py-12 text-center text-stone-500 dark:text-stone-500">
+      No projects in this category yet.
+    </p>
+  </div>
+
+  <script>
+    const buttons = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
+    const items = document.querySelectorAll<HTMLElement>('.project-item');
+    const emptyState = document.getElementById('empty-state');
+
+    const idleClasses = [
+      'text-stone-600',
+      'ring-stone-300/70',
+      'hover:bg-stone-200/60',
+      'dark:text-stone-400',
+      'dark:ring-stone-700',
+      'dark:hover:bg-stone-800',
+    ];
+
+    function applyFilter(filter: string) {
+      let visible = 0;
+      items.forEach((item) => {
+        const cats = (item.dataset.categories ?? '').split(' ');
+        const show = filter === 'all' || cats.includes(filter);
+        item.classList.toggle('hidden', !show);
+        if (show) visible++;
+      });
+      emptyState?.classList.toggle('hidden', visible > 0);
+    }
+
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        buttons.forEach((b) => {
+          const isActive = b === btn;
+          b.setAttribute('aria-pressed', String(isActive));
+          b.classList.toggle('bg-accent-600', isActive);
+          b.classList.toggle('text-white', isActive);
+          b.classList.toggle('ring-accent-600', isActive);
+          idleClasses.forEach((c) => b.classList.toggle(c, !isActive));
+        });
+        applyFilter(btn.dataset.filter ?? 'all');
+      });
+    });
+  </script>
+</BaseLayout>

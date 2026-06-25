@@ -1,0 +1,153 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Tag from '../components/Tag.astro';
+import Icon from '../components/Icon.astro';
+import { categoryLabel, type CategoryId } from '../data/categories';
+
+interface Props {
+  data: {
+    title: string;
+    summary: string;
+    abstract: string;
+    categories: CategoryId[];
+    tags?: string[];
+    role: string;
+    dates: string;
+    thumbnail?: string;
+    stack?: string[];
+    results?: string[];
+    learned?: string[];
+    links?: { label: string; url: string; type: string }[];
+  };
+}
+const { data } = Astro.props;
+const links = data.links ?? [];
+const stack = data.stack ?? [];
+const results = data.results ?? [];
+const learned = data.learned ?? [];
+---
+
+<BaseLayout title={data.title} description={data.summary} type="article" image={data.thumbnail}>
+  <article class="mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16">
+    <a
+      href="/projects"
+      class="mb-8 inline-flex items-center gap-1.5 text-sm font-medium text-stone-500 transition-colors hover:text-accent-600 dark:text-stone-400 dark:hover:text-accent-400"
+    >
+      <span aria-hidden="true">&larr;</span> All projects
+    </a>
+
+    <header>
+      <div class="mb-3 flex flex-wrap gap-1.5">
+        {data.categories.map((c) => <Tag variant="solid">{categoryLabel(c)}</Tag>)}
+      </div>
+
+      <h1 class="font-serif text-4xl leading-tight text-stone-900 dark:text-stone-100 sm:text-5xl">
+        {data.title}
+      </h1>
+
+      <p class="mt-4 text-lg leading-relaxed text-stone-600 dark:text-stone-400">
+        {data.abstract}
+      </p>
+
+      <dl class="mt-6 flex flex-wrap gap-x-8 gap-y-2 text-sm">
+        <div>
+          <dt class="text-stone-500 dark:text-stone-500">Role</dt>
+          <dd class="font-medium text-stone-800 dark:text-stone-200">{data.role}</dd>
+        </div>
+        <div>
+          <dt class="text-stone-500 dark:text-stone-500">Timeline</dt>
+          <dd class="font-medium text-stone-800 dark:text-stone-200">{data.dates}</dd>
+        </div>
+      </dl>
+
+      {
+        links.length > 0 && (
+          <div class="mt-6 flex flex-wrap gap-2">
+            {links.map((link) => {
+              const isPlaceholder = !link.url || link.url === '#';
+              const isExternal = link.url.startsWith('http');
+              return isPlaceholder ? (
+                <span class="inline-flex items-center gap-1.5 rounded-md border border-dashed border-stone-300 px-3 py-1.5 text-sm text-stone-400 dark:border-stone-700 dark:text-stone-600">
+                  <Icon name={link.type} class="h-4 w-4" /> {link.label}
+                </span>
+              ) : (
+                <a
+                  href={link.url}
+                  target={isExternal ? '_blank' : undefined}
+                  rel={isExternal ? 'noopener noreferrer' : undefined}
+                  class="inline-flex items-center gap-1.5 rounded-md bg-stone-900 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-accent-600 dark:bg-stone-100 dark:text-stone-900 dark:hover:bg-accent-400"
+                >
+                  <Icon name={link.type} class="h-4 w-4" /> {link.label}
+                </a>
+              );
+            })}
+          </div>
+        )
+      }
+    </header>
+
+    {
+      data.thumbnail && (
+        <img
+          src={data.thumbnail}
+          alt={`Thumbnail for ${data.title}`}
+          class="mt-10 aspect-[16/9] w-full rounded-xl border border-stone-200 object-cover dark:border-stone-800"
+          loading="lazy"
+          decoding="async"
+        />
+      )
+    }
+
+    {
+      results.length > 0 && (
+        <section class="mt-10 rounded-xl border border-accent-500/30 bg-accent-500/5 p-6">
+          <h2 class="font-serif text-xl text-stone-900 dark:text-stone-100">Key results</h2>
+          <ul class="mt-3 space-y-2">
+            {results.map((r) => (
+              <li class="flex gap-2.5 text-stone-700 dark:text-stone-300">
+                <Icon name="arrow" class="mt-1 h-4 w-4 shrink-0 text-accent-600 dark:text-accent-400" />
+                <span>{r}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    <!-- Project narrative (rendered MDX body). -->
+    <div class="prose-portfolio mt-10 max-w-none">
+      <slot />
+    </div>
+
+    {
+      stack.length > 0 && (
+        <section class="mt-10 border-t border-stone-200 pt-8 dark:border-stone-800">
+          <h2 class="mb-3 text-sm font-semibold uppercase tracking-widest text-stone-500 dark:text-stone-400">
+            Stack & tools
+          </h2>
+          <div class="flex flex-wrap gap-2">
+            {stack.map((s) => (
+              <Tag>{s}</Tag>
+            ))}
+          </div>
+        </section>
+      )
+    }
+
+    {
+      learned.length > 0 && (
+        <section class="mt-10 rounded-xl border border-stone-200 bg-white p-6 dark:border-stone-800 dark:bg-stone-900/60">
+          <h2 class="font-serif text-xl text-stone-900 dark:text-stone-100">What I learned</h2>
+          <ul class="mt-3 space-y-2">
+            {learned.map((l) => (
+              <li class="flex gap-2.5 text-stone-700 dark:text-stone-300">
+                <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent-500" aria-hidden="true" />
+                <span>{l}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+  </article>
+</BaseLayout>

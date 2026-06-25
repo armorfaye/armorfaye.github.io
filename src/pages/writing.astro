@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import DocumentCard from '../components/DocumentCard.astro';
+import { documents } from '../data/documents';
+---
+
+<BaseLayout
+  title="Writing & Documents"
+  description="Selected papers, posters, reports, and notes by Jiayu (Jerry) Liu."
+>
+  <div class="mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-16">
+    <SectionHeader
+      eyebrow="Writing & documents"
+      title="Papers, posters & reports"
+      subtitle="Selected documents from my research, with a note on what each one is and why it matters. Some links are placeholders until the files are public."
+    />
+
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {documents.map((doc) => <DocumentCard doc={doc} />)}
+    </div>
+  </div>
+</BaseLayout>

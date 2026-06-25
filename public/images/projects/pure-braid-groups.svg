@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675" role="img" aria-label="Pure Braid Groups">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#164e63"/>
+      <stop offset="1" stop-color="#18181b"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#g)"/>
+  <g fill="none" stroke-width="6" opacity="0.85" stroke-linecap="round">
+    <path d="M260,140 C360,260 160,360 260,480 C360,600 160,640 260,540" stroke="#67e8f9"/>
+    <path d="M380,140 C280,260 480,360 380,480 C280,600 480,640 380,540" stroke="#22d3ee"/>
+    <path d="M500,140 C600,260 400,360 500,480 C600,600 400,640 500,540" stroke="#a5f3fc"/>
+  </g>
+  <g stroke="#67e8f9" stroke-width="3" opacity="0.4">
+    <line x1="780" y1="340" x2="900" y2="270"/>
+    <line x1="780" y1="340" x2="900" y2="410"/>
+    <line x1="780" y1="340" x2="660" y2="270"/>
+    <line x1="780" y1="340" x2="660" y2="410"/>
+    <line x1="900" y1="270" x2="900" y2="410"/>
+    <line x1="660" y1="270" x2="660" y2="410"/>
+  </g>
+  <text x="80" y="600" font-family="Georgia, serif" font-style="italic" font-size="58" fill="#ecfeff">Pure Braid Groups</text>
+  <text x="84" y="640" font-family="system-ui, sans-serif" font-size="26" fill="#a5f3fc">Coxeter arrangements &amp; galleries</text>
+</svg>

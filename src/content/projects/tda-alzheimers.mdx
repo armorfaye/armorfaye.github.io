@@ -1,0 +1,54 @@
+---
+title: 'Topological Data Analysis for Alzheimer\u2019s Disease Diagnosis'
+summary: 'Applied persistent homology and machine learning to MRI-derived features for Alzheimer\u2019s diagnosis.'
+abstract: 'This project studies whether the shape of MRI-derived data carries a diagnostic signal for Alzheimer\u2019s disease. Using Vietoris\u2013Rips filtrations, persistence diagrams, and persistence images as topological features, it compares classical and deep models — logistic regression, random forests, and a CNN — for diagnosis. Published in the National High School Journal of Science.'
+categories: ['ai-ml', 'math-theory']
+tags: ['Topological Data Analysis', 'Persistent Homology', 'Machine Learning', 'Biomedical', 'Python']
+role: 'Lead author — methods, experiments, write-up'
+dates: 'Dec 2023 – Nov 2024'
+featured: true
+order: 3
+thumbnail: '/images/projects/tda-alzheimers.svg'
+stack: ['Python', 'scikit-learn', 'PyTorch', 'Ripser / GUDHI']
+results:
+  - 'PLACEHOLDER — add your accuracy / AUC numbers for each model.'
+  - 'PLACEHOLDER — note which topological features were most predictive.'
+  - 'Published in the National High School Journal of Science (NHSJS).'
+learned:
+  - 'Persistent homology turns geometric structure into features a model can use, complementing raw intensities.'
+  - 'Comparing classical and deep models on the same features clarifies where topology actually helps.'
+links:
+  - { label: 'Paper (NHSJS) — placeholder', url: '#', type: 'paper' }
+  - { label: 'GitHub (placeholder)', url: '#', type: 'repo' }
+  - { label: 'Poster (placeholder)', url: '#', type: 'poster' }
+---
+
+## Problem & motivation
+
+Early Alzheimer's diagnosis from MRI is hard because the relevant structure is
+distributed and subtle. Topological data analysis (TDA) offers a different lens:
+instead of looking only at intensities, it measures the *shape* of the data —
+connected components, loops, and voids — which can persist as a robust signal.
+
+## What I built
+
+A diagnosis pipeline that extracts topological features from MRI-derived data
+and feeds them into several models, with a controlled comparison across model
+families on identical inputs.
+
+## Technical approach
+
+- **Vietoris–Rips filtrations** build a sequence of simplicial complexes from
+  the data at increasing scales.
+- **Persistence diagrams and persistence images** summarize which topological
+  features appear and how long they persist, giving fixed-size, model-ready
+  representations.
+- **Model comparison.** Logistic regression, a random forest, and a CNN are
+  trained and compared on the same features to isolate the contribution of the
+  topological representation.
+
+## Publication
+
+Published in the **National High School Journal of Science**, mentored by
+Prof. Dawid Kielak (Oxford). The metrics in the "Key results" box above are
+placeholders — replace them with your final numbers.

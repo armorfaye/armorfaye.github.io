@@ -1,0 +1,56 @@
+---
+import { site, socials } from '../data/site';
+import Icon from './Icon.astro';
+
+const year = new Date().getFullYear();
+const links = [
+  { name: 'github', label: 'GitHub', url: socials.github },
+  { name: 'linkedin', label: 'LinkedIn', url: socials.linkedin },
+  { name: 'mail', label: 'Email', url: socials.email },
+  socials.scholar
+    ? { name: 'scholar', label: 'Google Scholar', url: socials.scholar }
+    : null,
+].filter(Boolean) as { name: string; label: string; url: string }[];
+---
+
+<footer id="contact" class="mt-24 border-t border-stone-200/70 dark:border-stone-800/70">
+  <div class="mx-auto max-w-5xl px-4 py-12 sm:px-6">
+    <div class="flex flex-col items-start justify-between gap-8 sm:flex-row sm:items-center">
+      <div>
+        <p class="font-serif text-2xl text-stone-900 dark:text-stone-100">Let&rsquo;s connect</p>
+        <p class="mt-2 text-stone-600 dark:text-stone-400">
+          Reach me at
+          <a
+            href={socials.email}
+            class="text-accent-700 underline underline-offset-2 hover:text-accent-500 dark:text-accent-400"
+            >{site.email}</a
+          >.
+        </p>
+      </div>
+      <div class="flex items-center gap-2">
+        {
+          links.map((link) => (
+            <a
+              href={link.url}
+              target={link.url.startsWith('http') ? '_blank' : undefined}
+              rel={link.url.startsWith('http') ? 'noopener noreferrer' : undefined}
+              class="inline-flex h-10 w-10 items-center justify-center rounded-md text-stone-600 ring-1 ring-inset ring-stone-300/70 transition-colors hover:bg-stone-200/60 hover:text-stone-900 dark:text-stone-300 dark:ring-stone-700 dark:hover:bg-stone-800 dark:hover:text-stone-100"
+              aria-label={link.label}
+            >
+              <Icon name={link.name} class="h-5 w-5" />
+            </a>
+          ))
+        }
+        <a
+          href={site.resume}
+          class="inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium text-stone-600 ring-1 ring-inset ring-stone-300/70 transition-colors hover:bg-stone-200/60 hover:text-stone-900 dark:text-stone-300 dark:ring-stone-700 dark:hover:bg-stone-800 dark:hover:text-stone-100"
+        >
+          <Icon name="resume" class="h-4 w-4" /> Resume
+        </a>
+      </div>
+    </div>
+    <p class="mt-10 text-sm text-stone-500 dark:text-stone-500">
+      &copy; {year} {site.name}. Built with Astro, TypeScript, and Tailwind CSS.
+    </p>
+  </div>
+</footer>

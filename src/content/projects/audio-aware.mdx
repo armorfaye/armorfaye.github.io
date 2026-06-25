@@ -1,0 +1,69 @@
+---
+title: 'AudioAware: AI-Guided Assistive Device for the Deaf and Hearing Impaired'
+summary: 'A multimodal wearable that localizes and identifies sound sources in real time using a microphone array, camera, and wristband feedback.'
+abstract: 'AudioAware is a low-cost assistive device that gives deaf and hearing-impaired users situational awareness by localizing and classifying sounds in real time. It pairs a custom four-microphone direction-of-arrival network (JerryNet), a fine-tuned CLAP audio classifier, and an audio-visual localization model that fuses YOLO detections with sound to pinpoint the exact source on a wristband display.'
+categories: ['assistive-tech', 'ai-ml', 'software-systems']
+tags: ['Multimodal', 'Audio', 'Computer Vision', 'Embedded', 'PyTorch', 'CLAP', 'YOLO']
+role: 'Sole creator — hardware, models, data, integration'
+dates: 'Jun 2024 – Nov 2025'
+featured: true
+order: 2
+thumbnail: '/images/projects/audio-aware.svg'
+stack: ['Python', 'PyTorch', 'CLAP', 'YOLOv9', 'ESP32-S3', 'FastAPI']
+results:
+  - 'JerryNet reached 91.1% precision for direction-of-arrival, beating all baselines (p < 0.001).'
+  - 'Fine-tuned CLAP classifier hit 98.5% accuracy on a custom set and 95% on AudioSet.'
+  - 'Audio-visual localization achieved cIoU 0.892 and AUC 0.658, surpassing comparable models.'
+learned:
+  - 'Fusing audio, vision, and text modalities outperforms any single modality for localizing real-world sounds.'
+  - 'Designing a custom dataset around the hard cases (noisy, multi-directional) is essential when no benchmark exists.'
+  - 'End-to-end hardware/software integration surfaces latency and reliability constraints that pure ML work hides.'
+links:
+  - { label: 'ISEF Research Poster', url: '/docs/Jerry_Liu_ISEF_AudioAware_Poster.pdf', type: 'poster' }
+  - { label: 'GitHub (placeholder)', url: '#', type: 'repo' }
+  - { label: 'Demo video (placeholder)', url: '#', type: 'demo' }
+  - { label: 'Technical report (placeholder)', url: '#', type: 'report' }
+---
+
+## Problem & motivation
+
+Deaf and hearing-impaired people miss critical auditory cues — a car horn, a
+bike bell, someone calling out. AudioAware fills a gap in assistive technology
+by not just detecting that a sound exists, but telling the user *what* it is and
+*where* it is coming from, in real time.
+
+## What I built
+
+A wearable system made of smart glasses (four microphones + a camera) and a
+wristband display, connected through a control loop that localizes and
+classifies sounds and shows the user the source object and its direction.
+
+## Technical approach
+
+The system has three components:
+
+- **JerryNet — direction of arrival.** A custom CNN takes a phase matrix built
+  from four concurrent microphones and predicts one of nine directions. Audio
+  is amplified to exaggerate inter-microphone volume differences.
+- **CLAP audio classifier.** A fine-tuned Contrastive Language-Audio Pretraining
+  model identifies the exact sound class from audio alone, working zero-shot at
+  inference time.
+- **Multimodal integration.** YOLOv9 generates object bounding boxes, and an
+  audio-visual localization model (SIRA-SSL) selects the box that best matches
+  the sound using a complete Intersection-over-Union (cIoU) criterion.
+
+A FastAPI server coordinates the models, and the ESP32-S3-based hardware streams
+audio/video and renders direction + object text/imagery on the wristband.
+
+## Data collection
+
+Because no suitable benchmark existed, I collected a custom dataset of 450 sets
+from four concurrent microphones — 50 samples for each of nine directions —
+split across indoor and outdoor environments to build robustness to background
+noise.
+
+## What's next
+
+Collect a larger and more diverse dataset, optimize each component to cut
+latency and server dependence, and explore reinforcement learning to adapt
+sound-priority to user preference over time.

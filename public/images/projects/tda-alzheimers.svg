@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675" role="img" aria-label="Topological Data Analysis">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0891b2"/>
+      <stop offset="1" stop-color="#0c0a09"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#g)"/>
+  <g fill="#67e8f9" opacity="0.9">
+    <circle cx="300" cy="220" r="9"/><circle cx="420" cy="180" r="9"/><circle cx="520" cy="280" r="9"/>
+    <circle cx="380" cy="330" r="9"/><circle cx="260" cy="360" r="9"/><circle cx="480" cy="400" r="9"/>
+    <circle cx="600" cy="200" r="9"/><circle cx="640" cy="340" r="9"/>
+  </g>
+  <g fill="none" stroke="#22d3ee" stroke-width="3" opacity="0.45">
+    <path d="M300,220 L420,180 L520,280 L380,330 Z"/>
+    <path d="M380,330 L260,360 L480,400 Z"/>
+    <path d="M520,280 L600,200 L640,340 Z"/>
+  </g>
+  <g stroke="#a5f3fc" stroke-width="3" opacity="0.6">
+    <line x1="820" y1="460" x2="1040" y2="460"/>
+    <line x1="820" y1="460" x2="820" y2="240"/>
+    <line x1="820" y1="460" x2="1040" y2="240" stroke-dasharray="8 8"/>
+  </g>
+  <g fill="#67e8f9">
+    <circle cx="880" cy="380" r="7"/><circle cx="930" cy="320" r="7"/><circle cx="980" cy="300" r="7"/><circle cx="900" cy="350" r="7"/>
+  </g>
+  <text x="80" y="600" font-family="Georgia, serif" font-style="italic" font-size="58" fill="#ecfeff">Topological Data Analysis</text>
+  <text x="84" y="640" font-family="system-ui, sans-serif" font-size="26" fill="#a5f3fc">Persistent homology for diagnosis</text>
+</svg>

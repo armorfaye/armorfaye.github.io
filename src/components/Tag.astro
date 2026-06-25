@@ -1,0 +1,16 @@
+---
+interface Props {
+  // 'solid' for category emphasis, 'outline' for skills/tags.
+  variant?: 'solid' | 'outline';
+}
+const { variant = 'outline' } = Astro.props;
+
+const base =
+  'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium';
+const styles =
+  variant === 'solid'
+    ? 'bg-accent-500/10 text-accent-700 dark:text-accent-300 ring-1 ring-inset ring-accent-500/30'
+    : 'bg-stone-200/60 text-stone-600 dark:bg-stone-800/80 dark:text-stone-300 ring-1 ring-inset ring-stone-300/60 dark:ring-stone-700';
+---
+
+<span class={`${base} ${styles}`}><slot /></span>

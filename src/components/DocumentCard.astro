@@ -1,0 +1,74 @@
+---
+import Icon from './Icon.astro';
+import Tag from './Tag.astro';
+import type { DocumentEntry } from '../data/documents';
+
+interface Props {
+  doc: DocumentEntry;
+}
+const { doc } = Astro.props;
+const isPlaceholder = doc.placeholder || !doc.url || doc.url === '#';
+const isExternal = doc.url.startsWith('http');
+// Map document type to an icon.
+const iconByType: Record<string, string> = {
+  paper: 'paper',
+  poster: 'poster',
+  slides: 'slides',
+  report: 'report',
+  notes: 'site',
+  resume: 'resume',
+};
+const icon = iconByType[doc.type] ?? 'paper';
+---
+
+<article
+  class:list={[
+    'group flex flex-col rounded-xl border p-5 transition-all duration-300',
+    isPlaceholder
+      ? 'border-dashed border-stone-300 bg-stone-100/40 dark:border-stone-700 dark:bg-stone-900/30'
+      : 'border-stone-200 bg-white hover:-translate-y-1 hover:border-accent-400/60 hover:shadow-lg hover:shadow-accent-500/5 dark:border-stone-800 dark:bg-stone-900/60',
+  ]}
+>
+  <div class="mb-3 flex items-start justify-between gap-3">
+    <span
+      class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent-500/10 text-accent-700 dark:text-accent-300"
+    >
+      <Icon name={icon} class="h-5 w-5" />
+    </span>
+    <Tag variant="solid">{doc.type}</Tag>
+  </div>
+
+  <h3 class="font-serif text-lg text-stone-900 dark:text-stone-100">{doc.title}</h3>
+
+  {
+    (doc.venue || doc.date) && (
+      <p class="mt-1 text-xs text-stone-500 dark:text-stone-500">
+        {[doc.venue, doc.date].filter(Boolean).join(' \u00b7 ')}
+      </p>
+    )
+  }
+
+  <p class="mt-2 flex-1 text-sm leading-relaxed text-stone-600 dark:text-stone-400">
+    {doc.description}
+  </p>
+
+  <div class="mt-4">
+    {
+      isPlaceholder ? (
+        <span class="inline-flex items-center gap-1.5 text-sm font-medium text-stone-400 dark:text-stone-600">
+          <Icon name="external" class="h-4 w-4" /> Link coming soon
+        </span>
+      ) : (
+        <a
+          href={doc.url}
+          target={isExternal ? '_blank' : undefined}
+          rel={isExternal ? 'noopener noreferrer' : undefined}
+          class="inline-flex items-center gap-1.5 text-sm font-medium text-accent-700 transition-colors hover:text-accent-500 dark:text-accent-400"
+        >
+          {doc.type === 'resume' ? 'View resume' : 'Open document'}
+          <Icon name={isExternal ? 'external' : 'arrow'} class="h-4 w-4" />
+        </a>
+      )
+    }
+  </div>
+</article>

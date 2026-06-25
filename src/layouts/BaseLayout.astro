@@ -1,0 +1,85 @@
+---
+import '../styles/global.css';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+import { site } from '../data/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+  // Path under /public to an Open Graph image (defaults to site.ogImage).
+  image?: string;
+  // 'website' (default) or 'article' for project pages.
+  type?: 'website' | 'article';
+}
+
+const {
+  title,
+  description = site.description,
+  image = site.ogImage,
+  type = 'website',
+} = Astro.props;
+
+const pageTitle = title ? `${title} \u2014 ${site.shortName}` : `${site.name} \u2014 ${site.tagline}`;
+const canonical = new URL(Astro.url.pathname, site.url).href;
+const ogImage = new URL(image, site.url).href;
+---
+
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <!-- Open Graph (replace public/images/og-default.png with a real 1200x630 image). -->
+    <meta property="og:type" content={type} />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+
+    <!-- Twitter / X card. -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <!-- Apply the saved/system theme before paint to avoid a flash. -->
+    <script is:inline>
+      (function () {
+        try {
+          const stored = localStorage.getItem('theme');
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (stored === 'dark' || (!stored && prefersDark)) {
+            document.documentElement.classList.add('dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body class="flex min-h-screen flex-col">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-accent-600 focus:px-4 focus:py-2 focus:text-white"
+    >
+      Skip to content
+    </a>
+
+    <Navbar />
+
+    <main id="main" class="flex-1">
+      <slot />
+    </main>
+
+    <Footer />
+  </body>
+</html>

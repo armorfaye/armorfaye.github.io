@@ -1,0 +1,43 @@
+---
+title: 'LLM Pretraining and Architecture Notes'
+summary: 'Technical notes on transformers, mixture-of-experts, scaling laws, distributed training, midtraining, and optimization.'
+abstract: 'An ongoing set of technical notes that work through how modern large language models are built and trained — transformer internals, mixture-of-experts, scaling laws, distributed-training strategies, midtraining, and optimization. This is a learning and writing project that synthesizes the literature rather than presenting original research.'
+categories: ['ai-ml', 'software-systems']
+tags: ['LLMs', 'Transformers', 'Mixture-of-Experts', 'Scaling Laws', 'Distributed Training', 'Technical Writing']
+role: 'Author — self-directed learning and writing'
+dates: '2025 – present'
+featured: false
+order: 5
+thumbnail: '/images/projects/llm-notes.svg'
+stack: ['PyTorch', 'Python']
+results:
+  - 'A growing, structured reference covering architecture and training systems.'
+  - 'Synthesis of published work — explicitly not a claim of original research.'
+learned:
+  - 'Scaling laws connect compute, data, and parameters into concrete design decisions.'
+  - 'MoE and distributed-training choices are as much systems problems as modeling ones.'
+links:
+  - { label: 'Notes / blog (placeholder)', url: '#', type: 'site' }
+---
+
+## What this is
+
+These notes are a structured walk through how modern LLMs are designed and
+trained. The intent is to build deep, first-principles understanding and to
+write it down clearly — not to claim original research. Sources are cited in the
+notes themselves.
+
+## Topics covered
+
+- **Transformer internals.** Attention, normalization, positional schemes, and
+  the trade-offs between architectural variants.
+- **Mixture-of-experts (MoE).** Routing, capacity, load balancing, and why
+  sparse models change the compute/quality curve.
+- **Scaling laws.** How loss relates to parameters, data, and compute, and what
+  that implies for allocating a fixed budget.
+- **Distributed training.** Data, tensor, pipeline, and expert parallelism, plus
+  the memory and communication bottlenecks behind each.
+- **Midtraining.** Continued pretraining, data mixture shifts, and curriculum
+  considerations between pretraining and post-training.
+- **Optimization.** Optimizers, learning-rate schedules, and stability tricks at
+  scale.

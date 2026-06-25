@@ -1,0 +1,41 @@
+---
+interface Props {
+  eyebrow?: string;
+  title: string;
+  subtitle?: string;
+  // Optional "see all" style link on the right.
+  link?: { label: string; href: string };
+}
+const { eyebrow, title, subtitle, link } = Astro.props;
+---
+
+<div class="mb-8 flex items-end justify-between gap-4">
+  <div>
+    {
+      eyebrow && (
+        <p class="mb-2 text-sm font-medium uppercase tracking-widest text-accent-600 dark:text-accent-400">
+          {eyebrow}
+        </p>
+      )
+    }
+    <h2 class="font-serif text-3xl sm:text-4xl text-stone-900 dark:text-stone-100">
+      {title}
+    </h2>
+    {
+      subtitle && (
+        <p class="mt-2 max-w-2xl text-stone-600 dark:text-stone-400">{subtitle}</p>
+      )
+    }
+  </div>
+  {
+    link && (
+      <a
+        href={link.href}
+        class="hidden shrink-0 text-sm font-medium text-accent-700 hover:text-accent-500 dark:text-accent-400 sm:inline-flex sm:items-center sm:gap-1"
+      >
+        {link.label}
+        <span aria-hidden="true">&rarr;</span>
+      </a>
+    )
+  }
+</div>

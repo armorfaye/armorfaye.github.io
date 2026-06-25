@@ -1,0 +1,126 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import Tag from '../components/Tag.astro';
+import Icon from '../components/Icon.astro';
+import { socials, site } from '../data/site';
+
+const academicInterests = [
+  'Topology & hyperplane arrangements',
+  'Representation theory',
+  'Analysis & numerical methods',
+  'Probability & stochastic systems',
+];
+const technicalInterests = [
+  'Large language models & pretraining',
+  'Multimodal learning',
+  'Computer vision & pose',
+  'Assistive technology',
+  'Scientific & high-performance computing',
+];
+
+const links = [
+  { name: 'github', label: 'GitHub', url: socials.github },
+  { name: 'linkedin', label: 'LinkedIn', url: socials.linkedin },
+  { name: 'mail', label: 'Email', url: socials.email },
+  socials.scholar
+    ? { name: 'scholar', label: 'Google Scholar', url: socials.scholar }
+    : null,
+].filter(Boolean) as { name: string; label: string; url: string }[];
+---
+
+<BaseLayout
+  title="About"
+  description="About Jiayu (Jerry) Liu — incoming Stanford undergraduate (Math & CS double major)."
+>
+  <div class="mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16">
+    <SectionHeader eyebrow="About" title="Hello, I'm Jerry" />
+
+    <div class="grid gap-10 sm:grid-cols-3">
+      <div class="sm:col-span-1">
+        <!-- Replace public/images/profile.jpg with a real photo (square, ~600x600). -->
+        <div
+          class="relative flex aspect-square w-full items-center justify-center overflow-hidden rounded-xl border border-stone-200 bg-gradient-to-br from-accent-500/15 to-stone-200 dark:border-stone-800 dark:to-stone-800"
+        >
+          <img
+            src="/images/profile.jpg"
+            alt="Jiayu (Jerry) Liu"
+            class="h-full w-full object-cover"
+            onerror="this.style.display='none'"
+          />
+          <span class="absolute font-serif text-5xl text-accent-700/60 dark:text-accent-400/60">JL</span>
+        </div>
+
+        <div class="mt-4 flex flex-wrap gap-2">
+          {
+            links.map((link) => (
+              <a
+                href={link.url}
+                target={link.url.startsWith('http') ? '_blank' : undefined}
+                rel={link.url.startsWith('http') ? 'noopener noreferrer' : undefined}
+                class="inline-flex h-9 w-9 items-center justify-center rounded-md text-stone-600 ring-1 ring-inset ring-stone-300/70 transition-colors hover:bg-stone-200/60 hover:text-stone-900 dark:text-stone-300 dark:ring-stone-700 dark:hover:bg-stone-800 dark:hover:text-stone-100"
+                aria-label={link.label}
+              >
+                <Icon name={link.name} class="h-4 w-4" />
+              </a>
+            ))
+          }
+        </div>
+      </div>
+
+      <div class="sm:col-span-2">
+        <div class="prose-portfolio max-w-none">
+          <p>
+            I'm an incoming undergraduate at Stanford University (Fall 2026),
+            intending a Mathematics and Computer Science double major. I came to
+            this field from two
+            directions at once: a love of mathematics for its own sake, and a
+            conviction that the right systems can turn research into tools that
+            help people.
+          </p>
+          <p>
+            That mix has shaped my work. In mathematics, I've worked on
+            configuration spaces at Princeton and on the fundamental groups of
+            hyperplane arrangements through MIT-PRIMES. In machine learning, I've
+            built a transformer pipeline for 3D human pose dynamics at MIT's
+            Seethapathi Lab, applied topological data analysis to Alzheimer's
+            diagnosis, and designed AudioAware, a multimodal assistive device for
+            the deaf and hearing impaired.
+          </p>
+          <p>
+            This summer I'll join StepFun in Beijing on the pretraining
+            multimodal team. I care most about problems where deep theory and
+            careful engineering meet&mdash;and where the result is something real.
+          </p>
+        </div>
+
+        <div class="mt-8">
+          <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-accent-700 dark:text-accent-400">
+            Academic interests
+          </h3>
+          <div class="flex flex-wrap gap-2">
+            {academicInterests.map((i) => <Tag>{i}</Tag>)}
+          </div>
+        </div>
+
+        <div class="mt-6">
+          <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-accent-700 dark:text-accent-400">
+            Technical interests
+          </h3>
+          <div class="flex flex-wrap gap-2">
+            {technicalInterests.map((i) => <Tag>{i}</Tag>)}
+          </div>
+        </div>
+
+        <div class="mt-8">
+          <a
+            href={site.resume}
+            class="inline-flex items-center gap-2 rounded-md bg-accent-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-accent-500"
+          >
+            <Icon name="resume" class="h-4 w-4" /> View my resume
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</BaseLayout>
