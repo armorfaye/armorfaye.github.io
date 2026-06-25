@@ -2,22 +2,70 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionHeader from '../components/SectionHeader.astro';
 import DocumentCard from '../components/DocumentCard.astro';
+import BlogCard from '../components/BlogCard.astro';
 import { documents } from '../data/documents';
+import { getCollection } from 'astro:content';
+
+const blogPosts = (await getCollection('blog'))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 2);
 ---
 
 <BaseLayout
   title="Writing & Documents"
-  description="Selected papers, posters, reports, and notes by Jiayu (Jerry) Liu."
+  description="Papers, posters, technical notes, and blog posts by Jiayu (Jerry) Liu."
 >
   <div class="mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-16">
     <SectionHeader
-      eyebrow="Writing & documents"
-      title="Papers, posters & reports"
-      subtitle="Selected documents from my research, with a note on what each one is and why it matters. Some links are placeholders until the files are public."
+      eyebrow="Writing"
+      title="Papers, notes & documents"
+      subtitle="Published research, preprints, posters, and technical writing from my projects."
     />
 
-    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {documents.map((doc) => <DocumentCard doc={doc} />)}
-    </div>
+    <!-- Blog -->
+    <section class="mb-16">
+      <div class="mb-6 flex items-end justify-between gap-4">
+        <div>
+          <h2 class="font-serif text-2xl text-stone-900 dark:text-stone-100">Blog</h2>
+          <p class="mt-1 text-sm text-stone-600 dark:text-stone-400">
+            Technical notes and reflections — updated as I learn.
+          </p>
+        </div>
+        <a
+          href="/blog"
+          class="shrink-0 text-sm font-medium text-accent-700 hover:text-accent-500 dark:text-accent-400"
+        >
+          All posts &rarr;
+        </a>
+      </div>
+      <div class="grid gap-6 sm:grid-cols-2">
+        {
+          blogPosts.map((post) => (
+            <BlogCard
+              slug={post.id}
+              title={post.data.title}
+              summary={post.data.summary}
+              date={post.data.date}
+              tags={post.data.tags}
+            />
+          ))
+        }
+      </div>
+    </section>
+
+    <!-- Documents -->
+    <section>
+      <div class="mb-6">
+        <h2 class="font-serif text-2xl text-stone-900 dark:text-stone-100">
+          Papers & documents
+        </h2>
+        <p class="mt-1 text-sm text-stone-600 dark:text-stone-400">
+          Peer-reviewed articles, preprints, workshop papers, and research posters.
+        </p>
+      </div>
+      <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {documents.map((doc) => <DocumentCard doc={doc} />)}
+      </div>
+    </section>
   </div>
 </BaseLayout>

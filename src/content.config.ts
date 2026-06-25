@@ -1,35 +1,32 @@
 import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
+import { decodeUnicodeEscapes } from './lib/decodeUnicodeEscapes';
 
-// Projects collection. Add a new project by dropping a .mdx file in
-// src/content/projects/ that matches this schema. The file name (minus the
-// extension) becomes the URL slug at /projects/<slug>.
+const text = () => z.string().transform(decodeUnicodeEscapes);
+
 const projects = defineCollection({
   loader: glob({ pattern: '**/*.mdx', base: './src/content/projects' }),
   schema: z.object({
-    title: z.string(),
-    summary: z.string(),
-    abstract: z.string(),
+    title: text(),
+    summary: text(),
+    abstract: text(),
     categories: z.array(
       z.enum(['ai-ml', 'assistive-tech', 'math-theory', 'software-systems']),
     ),
-    tags: z.array(z.string()).default([]),
-    role: z.string(),
-    dates: z.string(),
+    tags: z.array(text()).default([]),
+    role: text(),
+    dates: text(),
     featured: z.boolean().default(false),
-    // Display order on the projects page (lower = earlier).
     order: z.number().default(99),
-    // Path under /public, e.g. "/images/projects/foo.svg".
     thumbnail: z.string().optional(),
-    stack: z.array(z.string()).default([]),
-    results: z.array(z.string()).default([]),
-    learned: z.array(z.string()).default([]),
+    stack: z.array(text()).default([]),
+    results: z.array(text()).default([]),
+    learned: z.array(text()).default([]),
     links: z
       .array(
         z.object({
-          label: z.string(),
+          label: text(),
           url: z.string(),
-          // Drives the icon/badge: repo | paper | poster | slides | demo | report | site
           type: z.string().default('site'),
         }),
       )
@@ -37,4 +34,16 @@ const projects = defineCollection({
   }),
 });
 
-export const collections = { projects };
+// Blog posts for /blog. Add a new .mdx file in src/content/blog/ to publish.
+const blog = defineCollection({
+  loader: glob({ pattern: '**/*.mdx', base: './src/content/blog' }),
+  schema: z.object({
+    title: text(),
+    summary: text(),
+    date: z.coerce.date(),
+    tags: z.array(text()).default([]),
+    featured: z.boolean().default(false),
+  }),
+});
+
+export const collections = { projects, blog };

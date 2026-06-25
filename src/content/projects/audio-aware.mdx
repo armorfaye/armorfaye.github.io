@@ -1,69 +1,75 @@
 ---
-title: 'AudioAware: AI-Guided Assistive Device for the Deaf and Hearing Impaired'
-summary: 'A multimodal wearable that localizes and identifies sound sources in real time using a microphone array, camera, and wristband feedback.'
-abstract: 'AudioAware is a low-cost assistive device that gives deaf and hearing-impaired users situational awareness by localizing and classifying sounds in real time. It pairs a custom four-microphone direction-of-arrival network (JerryNet), a fine-tuned CLAP audio classifier, and an audio-visual localization model that fuses YOLO detections with sound to pinpoint the exact source on a wristband display.'
+title: 'AudioAware: Multimodal Assistive Device for the Deaf and Hearing Impaired (arXiv 2025)'
+summary: 'Sole-creator wearable — four-mic array, camera, and wristband — that localizes and classifies sounds in real time for deaf and hearing-impaired users. JerryNet direction-of-arrival (91.1% precision), fine-tuned CLAP (98.5% / 95%), and audio-visual fusion (cIoU 0.892). Preprint on arXiv; presented at ISEF.'
+abstract: 'AudioAware is a low-cost assistive device that gives deaf and hearing-impaired users situational awareness by localizing and classifying sounds in real time. It combines JerryNet (a custom four-microphone direction-of-arrival CNN), a fine-tuned CLAP audio classifier, and a YOLOv9 + SIRA-SSL multimodal localization pipeline, coordinated through FastAPI and ESP32-S3 hardware with a wristband display. Preprint on arXiv (July 2025).'
 categories: ['assistive-tech', 'ai-ml', 'software-systems']
 tags: ['Multimodal', 'Audio', 'Computer Vision', 'Embedded', 'PyTorch', 'CLAP', 'YOLO']
-role: 'Sole creator — hardware, models, data, integration'
+role: 'Sole author — hardware, models, data collection, integration'
 dates: 'Jun 2024 – Nov 2025'
 featured: true
 order: 2
 thumbnail: '/images/projects/audio-aware.svg'
-stack: ['Python', 'PyTorch', 'CLAP', 'YOLOv9', 'ESP32-S3', 'FastAPI']
+stack: ['Python', 'PyTorch', 'CLAP', 'YOLOv9', 'SIRA-SSL', 'ESP32-S3', 'FastAPI']
 results:
-  - 'JerryNet reached 91.1% precision for direction-of-arrival, beating all baselines (p < 0.001).'
-  - 'Fine-tuned CLAP classifier hit 98.5% accuracy on a custom set and 95% on AudioSet.'
-  - 'Audio-visual localization achieved cIoU 0.892 and AUC 0.658, surpassing comparable models.'
+  - 'JerryNet: 91.1% precision for direction-of-arrival; statistically superior to all baselines (ANOVA + Tukey HSD, p < 0.001).'
+  - 'Fine-tuned CLAP: 98.5% accuracy on a custom 450-sample dataset and 95% on a 5,000-sample AudioSet subset.'
+  - 'Multimodal localization: cIoU 0.892 and AUC 0.658, outperforming comparable audio-visual models.'
+  - 'Published preprint on arXiv (cs.LG), July 2025.'
 learned:
   - 'Fusing audio, vision, and text modalities outperforms any single modality for localizing real-world sounds.'
-  - 'Designing a custom dataset around the hard cases (noisy, multi-directional) is essential when no benchmark exists.'
+  - 'Designing a custom dataset around hard cases (noisy, multi-directional) is essential when no benchmark exists.'
   - 'End-to-end hardware/software integration surfaces latency and reliability constraints that pure ML work hides.'
 links:
+  - { label: 'arXiv Preprint', url: 'https://arxiv.org/abs/2507.14215v1', type: 'paper' }
   - { label: 'ISEF Research Poster', url: '/docs/Jerry_Liu_ISEF_AudioAware_Poster.pdf', type: 'poster' }
-  - { label: 'GitHub (placeholder)', url: '#', type: 'repo' }
-  - { label: 'Demo video (placeholder)', url: '#', type: 'demo' }
-  - { label: 'Technical report (placeholder)', url: '#', type: 'report' }
 ---
 
 ## Problem & motivation
 
-Deaf and hearing-impaired people miss critical auditory cues — a car horn, a
-bike bell, someone calling out. AudioAware fills a gap in assistive technology
-by not just detecting that a sound exists, but telling the user *what* it is and
-*where* it is coming from, in real time.
+Deaf and hearing-impaired people miss critical auditory cues — a car horn, a bike
+bell, someone calling out. Existing assistive devices often detect *that* a sound
+occurred but fail to answer the two questions that matter: **what** is making the
+sound, and **where** is it coming from? AudioAware targets both in real time.
 
 ## What I built
 
-A wearable system made of smart glasses (four microphones + a camera) and a
-wristband display, connected through a control loop that localizes and
-classifies sounds and shows the user the source object and its direction.
+A complete wearable system:
+
+- **Smart glasses** with a four-microphone rectangular array and a camera.
+- **Wristband display** showing the identified sound source and its direction
+  (text + bounding-box imagery).
+- **Software stack** coordinating three ML models through a FastAPI server, with
+  ESP32-S3 microcontrollers handling audio/video capture and display.
 
 ## Technical approach
 
-The system has three components:
+### Component 1 — JerryNet (direction of arrival)
 
-- **JerryNet — direction of arrival.** A custom CNN takes a phase matrix built
-  from four concurrent microphones and predicts one of nine directions. Audio
-  is amplified to exaggerate inter-microphone volume differences.
-- **CLAP audio classifier.** A fine-tuned Contrastive Language-Audio Pretraining
-  model identifies the exact sound class from audio alone, working zero-shot at
-  inference time.
-- **Multimodal integration.** YOLOv9 generates object bounding boxes, and an
-  audio-visual localization model (SIRA-SSL) selects the box that best matches
-  the sound using a complete Intersection-over-Union (cIoU) criterion.
+A custom CNN takes a **phase matrix** built from four concurrent microphones and
+predicts one of nine directions of arrival. Audio is amplified to exaggerate
+inter-microphone volume differences. Trained on 450 custom samples (50 per
+direction, indoor and outdoor).
 
-A FastAPI server coordinates the models, and the ESP32-S3-based hardware streams
-audio/video and renders direction + object text/imagery on the wristband.
+### Component 2 — CLAP audio classification
+
+Fine-tuned Contrastive Language-Audio Pretraining (CLAP) identifies the exact
+sound class from audio alone, supporting zero-shot inference at deployment time.
+
+### Component 3 — Multimodal integration
+
+YOLOv9 generates object bounding boxes; an audio-visual localization model
+(SIRA-SSL) selects the box best matching the sound using complete Intersection
+over Union (cIoU). This fuses the reliable object detector with spatial audio
+localization.
 
 ## Data collection
 
-Because no suitable benchmark existed, I collected a custom dataset of 450 sets
-from four concurrent microphones — 50 samples for each of nine directions —
-split across indoor and outdoor environments to build robustness to background
-noise.
+No suitable public benchmark existed, so I collected 450 four-microphone datasets
+(50 per direction × 9 directions) across indoor and outdoor environments, designed
+to stress-test performance under background noise.
 
 ## What's next
 
-Collect a larger and more diverse dataset, optimize each component to cut
-latency and server dependence, and explore reinforcement learning to adapt
-sound-priority to user preference over time.
+Scale the dataset, optimize each component for on-device inference (reducing
+server dependence), and explore reinforcement learning to adapt sound-priority to
+individual user preferences over time.

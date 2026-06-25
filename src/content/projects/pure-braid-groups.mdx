@@ -1,24 +1,26 @@
 ---
-title: 'Pure Braid Groups and Coxeter Arrangements'
-summary: 'Studied presentations of pure braid groups through Coxeter arrangements, galleries, and rank-2 subarrangements.'
-abstract: 'This is a pure-mathematics project on the fundamental groups of hyperplane arrangements. It develops presentations of pure braid groups using the combinatorics of Coxeter arrangements — galleries between chambers and the structure of rank-2 subarrangements — supported by symbolic computational experiments.'
+title: 'Full-Twist Presentations for Hyperplane Arrangements'
+summary: 'MIT-PRIMES research conjecturing full-twist presentations for fundamental groups of complexified hyperplane arrangements, generalizing Artin braid presentations.'
+abstract: 'This MIT-PRIMES project (with Prof. Nathan Williams, UT Dallas) conjectures full-twist presentations for the fundamental group of the complement of a complexified finite central real hyperplane arrangement. Building on Salvetti’s combinatorial model, we introduce generators from minimal galleries of regions and relations from rank-2 subarrangements, then conjecture that the group is presented by equating all reduced words for the full twist. Proved for Coxeter types A, B, D, H₃, I₂(m), and F₄ (partially).'
 categories: ['math-theory']
-tags: ['Algebra', 'Topology', 'Hyperplane Arrangements', 'Braid Groups', 'SageMath']
-role: 'Research scholar (MIT-PRIMES), mentored by Prof. Nathan Williams'
-dates: 'Nov 2024 – Jan 2026'
+tags: ['Algebra', 'Topology', 'Hyperplane Arrangements', 'Braid Groups', 'Coxeter Groups', 'MIT-PRIMES']
+role: 'Lead author (MIT-PRIMES Math Track), mentored by Prof. Nathan Williams'
+dates: 'Nov 2024 – Sep 2025'
 featured: false
 order: 4
 thumbnail: '/images/projects/pure-braid-groups.svg'
-stack: ['SageMath', 'Python', 'LaTeX']
+stack: ['LaTeX', 'SageMath', 'Python']
 results:
-  - 'Algebraic methods for the fundamental groups of hyperplane arrangements.'
-  - 'PLACEHOLDER — state your main theorem / result once finalized.'
+  - 'Conjectured full-twist presentation for fundamental groups of complexified central hyperplane arrangements.'
+  - 'Proved for Coxeter arrangements of types A, B, D, H₃, I₂(m), and F₄ (partially).'
+  - 'Generalizes the classical Artin presentation of pure braid groups via Salvetti complexes and rank-2 subarrangements.'
 learned:
-  - 'Rank-2 subarrangements act as local building blocks for relations in the whole group.'
-  - 'Symbolic computation is a fast way to test conjectured relations before proving them.'
+  - 'Rank-2 subarrangements are the local building blocks — global relations assemble from these pieces.'
+  - 'Gallery combinatorics gives canonical generators; full-twist equalities encode the defining relations.'
+  - 'Symbolic computation on small Coxeter types is essential for testing conjectures before general proofs.'
 links:
-  - { label: 'Paper (placeholder)', url: '#', type: 'paper' }
-  - { label: 'Code (placeholder)', url: '#', type: 'repo' }
+  - { label: 'MIT-PRIMES Paper (PDF)', url: '/docs/Jerry_Liu_MIT_PRIMES_Paper.pdf', type: 'paper' }
+  - { label: 'Princeton paper (TLMS)', url: 'https://londmathsoc.onlinelibrary.wiley.com/doi/10.1112/tlm3.70024', type: 'paper' }
 ---
 
 import Theorem from '../../components/Theorem.astro';
@@ -26,42 +28,48 @@ import Theorem from '../../components/Theorem.astro';
 ## Problem & motivation
 
 The pure braid group is the fundamental group of the configuration space of
-points in the plane — equivalently, the complement of the braid (type A)
-hyperplane arrangement. A central question is how to read off a *presentation*
-(generators and relations) of such groups directly from the combinatorics of
-the underlying Coxeter arrangement.
+points in the plane — equivalently, the complement of the type-A Coxeter
+(hyperplane) arrangement. A classical result (Artin) gives a presentation by
+generators and relations. The natural question: **can we generalize this to
+arbitrary finite central real hyperplane arrangements?**
 
 ## What I studied
 
-I worked on presentations of pure braid groups via Coxeter arrangements, using
-**galleries** (minimal paths between chambers) and the structure of **rank-2
-subarrangements** as the source of the defining relations.
+Working through MIT-PRIMES (Math Track) with Prof. Nathan Williams, I developed
+a conjectural **full-twist presentation** for the fundamental group of the
+complement of a complexified finite central real hyperplane arrangement.
 
 ## Technical approach
 
-- **Coxeter arrangements.** The reflecting hyperplanes of a finite Coxeter group
-  cut space into chambers; loops in the complement encode the group.
-- **Galleries.** Minimal galleries between chambers give canonical generators,
-  and homotopies between galleries give relations.
-- **Rank-2 reductions.** Relations localize to rank-2 subarrangements, so the
-  global presentation is assembled from these local pieces.
+- **Salvetti complex.** A combinatorial model for the homotopy type of an
+  arrangement complement, encoding chambers and face incidences.
+- **Minimal galleries.** Generators arise from minimal galleries between chambers
+  in the Salvetti complex.
+- **Rank-2 subarrangements.** Relations are produced locally from rank-2
+  subarrangements — the global presentation is assembled from these local pieces.
+- **Full twist.** The central conjecture: the fundamental group is presented by
+  equating all reduced words for the **full twist** element.
 
-<Theorem label="Theorem (placeholder)">
-  Replace this with your precise statement. For example: every relation in the
-  pure braid group of a Coxeter arrangement is a consequence of the relations
-  coming from its rank-2 subarrangements.
+<Theorem label="Conjecture (Full-Twist Presentation)">
+  The fundamental group of the complement of a complexified finite central real
+  hyperplane arrangement admits a presentation whose defining relations are
+  obtained by identifying all reduced words for the full twist, with generators
+  corresponding to minimal galleries between chambers.
 </Theorem>
 
-<Theorem label="Proof sketch" kind="proof">
-  Outline the argument here — e.g. reduce an arbitrary loop to a product of
-  rank-2 contributions via gallery homotopies, then show each homotopy is
-  generated by the rank-2 relations. Fill in once finalized.
+<Theorem label="Verified cases" kind="proof">
+  The conjecture is proved for Coxeter arrangements of types A, B, D, H₃,
+  I₂(m), and partially for F₄. Each case reduces to checking that rank-2
+  subarrangement relations generate all gallery homotopies.
 </Theorem>
+
+## Related work
+
+Separately, I contributed to research on **configuration spaces** with Charles
+Fefferman at Princeton, published in the
+[Transactions of the London Mathematical Society](https://londmathsoc.onlinelibrary.wiley.com/doi/10.1112/tlm3.70024).
 
 ## Computational experiments
 
-> Placeholder for SageMath / Python experiments.
-
-Symbolic computation was used to enumerate galleries and verify candidate
-relations on small Coxeter types before proving the general statement. Drop the
-notebooks or scripts in the linked repository.
+Symbolic computation (SageMath) was used to enumerate galleries and verify
+candidate relations on small Coxeter types before attempting general proofs.

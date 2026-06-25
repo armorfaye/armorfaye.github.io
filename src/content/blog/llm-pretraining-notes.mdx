@@ -1,0 +1,59 @@
+---
+title: 'Notes on LLM Pretraining and Architecture'
+summary: 'Structured notes on transformers, mixture-of-experts, scaling laws, distributed training, and optimization — synthesizing the literature, not original research.'
+date: 2025-11-01
+tags: ['LLMs', 'Transformers', 'Systems', 'Technical Writing']
+featured: true
+---
+
+These notes are a working reference I maintain while studying how modern large
+language models are built and trained. They synthesize published work and my
+own reading — they are **not** a claim of original research.
+
+## Why write this down
+
+Most "architecture" decisions at scale are really **systems** decisions: how you
+shard parameters, how you schedule communication, and how you allocate a fixed
+compute budget across data, model size, and training steps. Scaling laws are the
+bridge that makes those trade-offs quantitative.
+
+## Topics I am working through
+
+### Transformer internals
+
+Attention, normalization, positional schemes, and the trade-offs between
+architectural variants (e.g. grouped-query attention, sliding windows, state-space
+hybrids). The goal is to understand *why* each variant exists, not just what it
+is called.
+
+### Mixture-of-experts (MoE)
+
+Routing, capacity, load balancing, and why sparse models change the
+compute/quality curve. MoE is as much an engineering problem (all-to-all
+communication, expert parallelism) as a modeling one.
+
+### Scaling laws
+
+How loss relates to parameters, data, and compute (Chinchilla-style analysis),
+and what that implies when you have a fixed FLOP or dollar budget.
+
+### Distributed training
+
+Data, tensor, pipeline, and expert parallelism — plus the memory and
+communication bottlenecks behind each. When does each strategy win?
+
+### Midtraining and data mixtures
+
+Continued pretraining, curriculum shifts between pretraining and post-training,
+and how data mixture changes affect downstream capability.
+
+### Optimization at scale
+
+Optimizers, learning-rate schedules, loss spikes, and stability tricks that
+matter when training runs for weeks on thousands of GPUs.
+
+## What I take away so far
+
+Writing forces clarity. A paper that says "we scale X" becomes actionable once
+you can map X to a concrete design choice — batch size, parallelism strategy,
+or data budget. That is the mental model these notes are building toward.

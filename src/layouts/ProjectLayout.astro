@@ -88,13 +88,15 @@ const learned = data.learned ?? [];
 
     {
       data.thumbnail && (
-        <img
-          src={data.thumbnail}
-          alt={`Thumbnail for ${data.title}`}
-          class="mt-10 aspect-[16/9] w-full rounded-xl border border-stone-200 object-cover dark:border-stone-800"
-          loading="lazy"
-          decoding="async"
-        />
+        <figure class="mt-10 overflow-hidden rounded-2xl border border-stone-200 shadow-lg shadow-stone-900/5 ring-1 ring-stone-200/80 dark:border-stone-700 dark:shadow-black/30 dark:ring-stone-700">
+          <img
+            src={data.thumbnail}
+            alt={`Visual for ${data.title}`}
+            class="aspect-[16/9] w-full object-cover"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
       )
     }
 

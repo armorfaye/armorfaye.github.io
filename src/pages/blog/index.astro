@@ -1,0 +1,38 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import BlogCard from '../../components/BlogCard.astro';
+
+const posts = (await getCollection('blog')).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+---
+
+<BaseLayout
+  title="Blog"
+  description="Technical notes and reflections on AI systems, machine learning, and mathematics by Jiayu (Jerry) Liu."
+>
+  <div class="mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-16">
+    <SectionHeader
+      eyebrow="Blog"
+      title="Notes & reflections"
+      subtitle="Technical writing on AI systems, machine learning, and mathematics — learning in public, not claiming original research unless stated."
+      link={{ label: 'Documents & papers', href: '/writing' }}
+    />
+
+    <div class="grid gap-6 sm:grid-cols-2">
+      {
+        posts.map((post) => (
+          <BlogCard
+            slug={post.id}
+            title={post.data.title}
+            summary={post.data.summary}
+            date={post.data.date}
+            tags={post.data.tags}
+          />
+        ))
+      }
+    </div>
+  </div>
+</BaseLayout>

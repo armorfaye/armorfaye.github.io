@@ -7,9 +7,7 @@ Static images served at `/images/...`.
 - `og-default.svg` — default social-share (Open Graph) image. For best results
   with social scrapers (LinkedIn, X, etc.), replace it with a **1200×630 PNG**
   and update `site.ogImage` in `src/data/site.ts`.
-- `profile.jpg` — **placeholder, not yet added.** Drop a square photo
-  (~600×600) here for the About page. Until then, the About page shows your
-  initials.
+- `profile.png` — profile photo on the About page.
 - `projects/` — project thumbnails (see below).
 
 ## Project thumbnails (`/images/projects/`)

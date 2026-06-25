@@ -1,54 +1,76 @@
 ---
-title: 'Topological Data Analysis for Alzheimer\u2019s Disease Diagnosis'
-summary: 'Applied persistent homology and machine learning to MRI-derived features for Alzheimer\u2019s diagnosis.'
-abstract: 'This project studies whether the shape of MRI-derived data carries a diagnostic signal for Alzheimer\u2019s disease. Using Vietoris\u2013Rips filtrations, persistence diagrams, and persistence images as topological features, it compares classical and deep models — logistic regression, random forests, and a CNN — for diagnosis. Published in the National High School Journal of Science.'
+title: 'Topological Data Analysis for Alzheimer’s Disease Diagnosis (NHSJS)'
+summary: 'Applied Vietoris–Rips persistent homology and persistence images to OASIS MRI slices for Alzheimer’s severity classification (461 subjects). Random forest reached 91.8% accuracy and AUC 0.93, beating CNN and logistic regression (p < 0.001). Published in NHSJS; mentored by Prof. Dawid Kielak (Oxford).'
+abstract: 'This project applies topological data analysis to classify Alzheimer’s disease severity from OASIS brain MRI. Using Vietoris–Rips filtrations, persistence diagrams, and persistence images as features, it compares logistic regression, random forest, and an AlexNet-style CNN on 461 subjects across four severity classes. The random forest on topological features achieved 91.8% accuracy and AUC 0.93, statistically outperforming both baselines. Published in the National High School Journal of Science (August 2025), mentored by Prof. Dawid Kielak (Oxford).'
 categories: ['ai-ml', 'math-theory']
-tags: ['Topological Data Analysis', 'Persistent Homology', 'Machine Learning', 'Biomedical', 'Python']
-role: 'Lead author — methods, experiments, write-up'
+tags: ['Topological Data Analysis', 'Persistent Homology', 'Machine Learning', 'Biomedical', 'Ripser']
+role: 'Lead author — theory, pipeline, experiments, write-up'
 dates: 'Dec 2023 – Nov 2024'
 featured: true
 order: 3
 thumbnail: '/images/projects/tda-alzheimers.svg'
-stack: ['Python', 'scikit-learn', 'PyTorch', 'Ripser / GUDHI']
+stack: ['Python', 'scikit-learn', 'PyTorch', 'Ripser', 'NumPy', 'Pandas']
 results:
-  - 'PLACEHOLDER — add your accuracy / AUC numbers for each model.'
-  - 'PLACEHOLDER — note which topological features were most predictive.'
-  - 'Published in the National High School Journal of Science (NHSJS).'
+  - 'Random forest on persistence images: 91.8% accuracy, AUC 0.93 (best overall).'
+  - 'AlexNet-style CNN benchmark: 86.5% accuracy.'
+  - 'Multivariate logistic regression: 78.2% accuracy.'
+  - 'Random forest statistically superior to both baselines (ANOVA F=55.32, Tukey HSD p < 0.001).'
+  - 'Top features: longest-lived H₀ component and count of significant H₁ loops — aligned with ventricular enlargement and cortical atrophy.'
+  - 'Published in NHSJS (August 2025).'
 learned:
-  - 'Persistent homology turns geometric structure into features a model can use, complementing raw intensities.'
-  - 'Comparing classical and deep models on the same features clarifies where topology actually helps.'
+  - 'Persistent homology encodes global shape that raw pixel intensities obscure — loops around ventricles and merging connected components track known AD pathology.'
+  - 'Interpretable topological features can match or beat deep learning while explaining *why* a case was classified.'
+  - 'Fair model comparison (same data splits, statistical testing) is as important as the headline accuracy number.'
 links:
-  - { label: 'Paper (NHSJS) — placeholder', url: '#', type: 'paper' }
-  - { label: 'GitHub (placeholder)', url: '#', type: 'repo' }
-  - { label: 'Poster (placeholder)', url: '#', type: 'poster' }
+  - { label: 'NHSJS Article', url: 'https://nhsjs.com/2025/topological-data-analysis-for-alzheimers-disease-diagnosis/', type: 'paper' }
+  - { label: 'Blog post', url: '/blog/persistent-homology-alzheimers', type: 'site' }
 ---
 
 ## Problem & motivation
 
-Early Alzheimer's diagnosis from MRI is hard because the relevant structure is
-distributed and subtle. Topological data analysis (TDA) offers a different lens:
-instead of looking only at intensities, it measures the *shape* of the data —
-connected components, loops, and voids — which can persist as a robust signal.
+Alzheimer's disease affects millions worldwide, and early diagnosis enables better
+care planning and clinical trial stratification. Standard CNN approaches on MRI
+can classify severity but often miss **high-order topological structure** — how
+connected components merge, how loops form around enlarged ventricles, how the
+shape of intensity maps changes as tissue atrophies.
+
+Topological data analysis (TDA) offers a complementary lens: instead of pixel
+intensities alone, it measures the **shape** of the data across scales.
 
 ## What I built
 
-A diagnosis pipeline that extracts topological features from MRI-derived data
-and feeds them into several models, with a controlled comparison across model
-families on identical inputs.
+An end-to-end pipeline on 461 OASIS MRI subjects (four severity classes:
+Non-Demented, Very Mild, Mild, and Demented):
+
+1. **Preprocessing** — 3D volumes sliced into ~60 axial 2D images per subject;
+   intensity normalization to [0, 1].
+2. **Topological feature extraction** — Vietoris–Rips filtrations on each slice;
+   persistence diagrams aggregated into 20×20 persistence images (400-dim vectors).
+3. **Classification** — random forest, multivariate logistic regression, and an
+   AlexNet-style CNN trained with stratified 70/15/15 splits and 10-fold CV for
+   hyperparameter tuning.
 
 ## Technical approach
 
-- **Vietoris–Rips filtrations** build a sequence of simplicial complexes from
-  the data at increasing scales.
-- **Persistence diagrams and persistence images** summarize which topological
-  features appear and how long they persist, giving fixed-size, model-ready
-  representations.
-- **Model comparison.** Logistic regression, a random forest, and a CNN are
-  trained and compared on the same features to isolate the contribution of the
-  topological representation.
+- **Filtration.** 100 linearly spaced intensity thresholds; Ripser computes H₀
+  (connected components) and H₁ (loops) persistence. Short-lived features (< 5
+  voxel persistence) filtered as noise.
+- **Persistence images.** Gaussian kernels (σ = 0.1) on a 20×20 birth–death grid,
+  flattened to fixed-size vectors for classical ML.
+- **CNN benchmark.** Three conv layers (32/64/128 filters), two FC layers, dropout
+  0.5; slice-level predictions averaged per subject.
 
-## Publication
+## Interpretability
 
-Published in the **National High School Journal of Science**, mentored by
-Prof. Dawid Kielak (Oxford). The metrics in the "Key results" box above are
-placeholders — replace them with your final numbers.
+Feature importance analysis showed the two most predictive variables were the
+**maximum H₀ lifetime** and the **count of H₁ loops above a persistence threshold**
+— consistent with ventricular enlargement (long-lived isolated components) and
+cortical thinning (numerous topological voids) in AD progression.
+
+## Limitations & outlook
+
+The sample is modest and demographically limited (OASIS cohort). Future work includes
+3D persistent homology on full volumes, hybrid CNN + topology models (our preliminary
+hybrid slightly outperformed either alone), and validation on independent cohorts.
+
+Read a shorter reflection on the [blog](/blog/persistent-homology-alzheimers).

@@ -70,6 +70,10 @@ export const experienceSections: ExperienceSection[] = [
           'Conducted research on configuration spaces with Fields Medalist Charles Fefferman.',
           'Co-authored a paper published in the Transactions of the London Mathematical Society.',
         ],
+        link: {
+          label: 'Read paper (TLMS)',
+          url: 'https://londmathsoc.onlinelibrary.wiley.com/doi/10.1112/tlm3.70024',
+        },
         highlight: true,
       },
       {

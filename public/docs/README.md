@@ -7,6 +7,8 @@ PDFs and other files linked from the **Writing** page and project pages live her
 - `Jerry_Liu_Resume.pdf` — linked from the navbar, footer, hero, and About page.
 - `Jerry_Liu_RSI_TriFallNet_Poster.pdf` — TriFallNet research poster.
 - `Jerry_Liu_ISEF_AudioAware_Poster.pdf` — AudioAware research poster.
+- `Jerry_Liu_MIT_PRIMES_Paper.pdf` — full-twist presentations (MIT-PRIMES).
+- `TriFallNet_AAAI_Workshop_Paper.pdf` — AAAI 2026 workshop paper.
 
 ## Adding or replacing a document
 

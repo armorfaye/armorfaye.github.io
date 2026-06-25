@@ -1,0 +1,47 @@
+---
+title: 'Why Persistent Homology for Brain MRI?'
+summary: 'A short note on how topological features from persistent homology can capture structural changes in Alzheimer’s disease — and why a random forest beat a CNN on OASIS MRI slices.'
+date: 2025-08-13
+tags: ['TDA', 'Neuroimaging', 'Machine Learning']
+featured: true
+---
+
+When I started working on Alzheimer's diagnosis from MRI, the natural first move
+was a convolutional neural network. CNNs are excellent at spatial patterns — but
+they can miss **global shape** information: how connected components merge, how
+loops form around ventricles, how the topology of intensity maps changes as
+tissue atrophies.
+
+## The topological lens
+
+Persistent homology tracks topological features (connected components, loops)
+across a **filtration** — a sequence of scales at which we include more of the
+data. In our OASIS pipeline:
+
+1. Each 3D MRI volume was sliced into ~60 axial 2D images (central slices).
+2. We built Vietoris–Rips filtrations on pixel intensities.
+3. Persistence diagrams were aggregated into **persistence images** — fixed-size
+   vectors a classifier can use.
+
+## What we found
+
+On 461 subjects across four severity classes (Non-Demented through Demented):
+
+| Model | Accuracy | AUC |
+|-------|----------|-----|
+| Random forest (topology) | **91.8%** | **0.93** |
+| AlexNet-style CNN | 86.5% | — |
+| Logistic regression | 78.2% | — |
+
+A one-way ANOVA and Tukey post-hoc tests showed the random forest was
+statistically superior to both baselines (p < 0.001).
+
+## Why this matters
+
+The highest-importance features were interpretable: longest-lived H₀ components
+and counts of significant H₁ loops — consistent with ventricular enlargement and
+cortical thinning in AD. Topology gave us **biomarkers you can explain**, not
+just a black-box score.
+
+The full methods, diagrams, and limitations are in the
+[NHSJS article](https://nhsjs.com/2025/topological-data-analysis-for-alzheimers-disease-diagnosis/).
