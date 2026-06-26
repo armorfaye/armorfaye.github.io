@@ -38,7 +38,7 @@ export const experienceSections: ExperienceSection[] = [
       {
         org: 'xAI',
         role: 'Full-Time Exceptional Engineer Offer',
-        dates: '2025',
+        dates: '2026',
         bullets: [
           'Received a full-time exceptional engineer offer as industry recognition.',
         ],
