@@ -4,17 +4,19 @@ Static images served at `/images/...`.
 
 ## What's here
 
-- `og-default.svg` — default social-share (Open Graph) image. For best results
-  with social scrapers (LinkedIn, X, etc.), replace it with a **1200×630 PNG**
-  and update `site.ogImage` in `src/data/site.ts`.
-- `profile.png` — profile photo on the About page.
+- `og-default.png` — default social-share (Open Graph) image, 1200×630.
+  `og-default.svg` is its editable source; re-export to PNG after editing.
+- `profile-dark.jpg` — portrait used in the home hero.
+- `profile.png` — the original studio photo (white background), kept as the source.
 - `projects/` — project thumbnails (see below).
 
 ## Project thumbnails (`/images/projects/`)
 
 Each project in `src/content/projects/` points to a thumbnail via its
-`thumbnail` frontmatter field. The current files are simple SVG placeholders:
+`thumbnail` frontmatter field. The current files are black-and-green SVG
+illustrations that match the site theme:
 
+- `senju.svg`
 - `trifallnet.svg`
 - `audio-aware.svg`
 - `tda-alzheimers.svg`
@@ -27,5 +29,3 @@ Each project in `src/content/projects/` points to a thumbnail via its
 2. Update the `thumbnail` path in that project's `.mdx` frontmatter, e.g.
    `thumbnail: '/images/projects/trifallnet.png'`.
 
-You mentioned you'll send more photos later — add them here and reference them
-from the relevant project's MDX (a gallery can be added to the project body).

@@ -1,5 +1,5 @@
 ---
-title: 'Topological Data Analysis for Alzheimer’s Disease Diagnosis (NHSJS)'
+title: 'Topological Data Analysis for Alzheimer’s Diagnosis'
 summary: 'Applied Vietoris–Rips persistent homology and persistence images to OASIS MRI slices for Alzheimer’s severity classification (461 subjects). Random forest reached 91.8% accuracy and AUC 0.93, beating CNN and logistic regression (p < 0.001). Published in NHSJS; mentored by Prof. Dawid Kielak (Oxford).'
 abstract: 'This project applies topological data analysis to classify Alzheimer’s disease severity from OASIS brain MRI. Using Vietoris–Rips filtrations, persistence diagrams, and persistence images as features, it compares logistic regression, random forest, and an AlexNet-style CNN on 461 subjects across four severity classes. The random forest on topological features achieved 91.8% accuracy and AUC 0.93, statistically outperforming both baselines. Published in the National High School Journal of Science (August 2025), mentored by Prof. Dawid Kielak (Oxford).'
 categories: ['ai-ml', 'math-theory']
@@ -23,7 +23,6 @@ learned:
   - 'Fair model comparison (same data splits, statistical testing) is as important as the headline accuracy number.'
 links:
   - { label: 'NHSJS Article', url: 'https://nhsjs.com/2025/topological-data-analysis-for-alzheimers-disease-diagnosis/', type: 'paper' }
-  - { label: 'Blog post', url: '/blog/persistent-homology-alzheimers', type: 'site' }
 ---
 
 ## Problem & motivation
@@ -72,5 +71,3 @@ cortical thinning (numerous topological voids) in AD progression.
 The sample is modest and demographically limited (OASIS cohort). Future work includes
 3D persistent homology on full volumes, hybrid CNN + topology models (our preliminary
 hybrid slightly outperformed either alone), and validation on independent cohorts.
-
-Read a shorter reflection on the [blog](/blog/persistent-homology-alzheimers).

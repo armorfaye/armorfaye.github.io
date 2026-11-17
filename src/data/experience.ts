@@ -1,17 +1,19 @@
-// Experience timeline data, grouped into sections that render on /experience
-// and feed the highlights on the home page. Add or reorder entries freely.
+// Experience timeline data, grouped into sections that render on /experience.
+// Entries marked `highlight` also appear in the home-page timeline.
 
 export interface ExperienceEntry {
   org: string;
   role: string;
   dates: string;
   location?: string;
-  // Each bullet is a short, plain-language accomplishment.
+  // Short, plain-language accomplishments.
   bullets: string[];
-  // Optional link (paper, lab page, program site, etc.).
-  link?: { label: string; url: string };
-  // Marked entries surface in the home-page "Selected highlights" section.
+  links?: { label: string; url: string }[];
+  // Shown on the home page.
   highlight?: boolean;
+  // Renders the live "now" indicator.
+  current?: boolean;
+  tags?: string[];
 }
 
 export interface ExperienceSection {
@@ -22,68 +24,94 @@ export interface ExperienceSection {
 
 export const experienceSections: ExperienceSection[] = [
   {
-    id: 'industry',
-    title: 'Industry',
+    id: 'research',
+    title: 'Research & Industry',
     entries: [
+      {
+        org: 'Stanford NLP · Percy Liang’s Group',
+        role: 'LLM Researcher, Marin (Open Athena)',
+        dates: 'Oct 2026 – Present',
+        location: 'Stanford, CA',
+        current: true,
+        highlight: true,
+        tags: ['Pretraining', 'RL environments', 'Data'],
+        bullets: [
+          'Developing a guidance-based pipeline for data creation and RL environment generation.',
+          'Contributing to the next generation of the Marin pretraining architecture (~600B parameters).',
+        ],
+        links: [
+          { label: 'Marin', url: 'https://marin.community' },
+        ],
+      },
+      {
+        org: 'Hazy Research · Stanford',
+        role: 'Researcher, Speculative Decoding for Next-Concept Models',
+        dates: '2026 – Present',
+        location: 'Stanford, CA',
+        current: true,
+        highlight: true,
+        tags: ['Inference', 'Speculative decoding', 'NCM'],
+        bullets: [
+          'Working with Hermann Kumbong on speculative decoding for Next-Concept Modeling (NCM), Hazy Research’s coarse-to-fine, parallel text-generation framework.',
+        ],
+        links: [
+          { label: 'NCM blog', url: 'https://hazyresearch.stanford.edu/blog/2026-10-12-ncm' },
+          { label: 'NCM paper', url: 'https://arxiv.org/abs/2610.14162' },
+        ],
+      },
       {
         org: 'StepFun',
-        role: 'Incoming Research Intern, Pretraining Multimodal Team',
-        dates: 'Summer 2026',
+        role: 'LLM Pretraining Intern',
+        dates: 'Jul 2026 – Sep 2026',
         location: 'Beijing, China',
-        bullets: [
-          'Joining the pretraining multimodal team for the summer.',
-        ],
         highlight: true,
+        tags: ['Architecture', 'Optimizers', 'Scaling'],
+        bullets: [
+          'Researched novel LLM architectures and optimizer improvements for Step 5 Pro, a multi-trillion-parameter model.',
+          'Evaluated each change on StepFun’s proprietary scaling ladder.',
+        ],
       },
       {
-        org: 'xAI',
-        role: 'Full-Time Exceptional Engineer Offer',
-        dates: '2026',
-        bullets: [
-          'Received a full-time exceptional engineer offer as industry recognition.',
-        ],
-        highlight: true,
-      },
-    ],
-  },
-  {
-    id: 'research',
-    title: 'Research',
-    entries: [
-      {
-        org: 'MIT — Seethapathi Lab',
+        org: 'MIT · Seethapathi Lab',
         role: 'Research Intern',
         dates: 'Jul 2025 – Aug 2025',
         location: 'Cambridge, MA',
-        bullets: [
-          'Developed a transformer-based pipeline for 3D human pose dynamics in PyTorch.',
-          'Co-authored a paper accepted to the AAAI 2026 Workshop on AI for Time Series (AI4TS).',
-        ],
         highlight: true,
+        tags: ['Transformers', '3D pose', 'Time series'],
+        bullets: [
+          'Built the transformer pipeline for 3D human pose dynamics (PyTorch).',
+          'First-author paper accepted to the AAAI 2026 Workshop on AI for Time Series (AI4TS).',
+        ],
+        links: [{ label: 'Project', url: '/projects/trifallnet' }],
       },
       {
-        org: 'Princeton University — Department of Mathematics',
+        org: 'Princeton University · Department of Mathematics',
         role: 'Research Assistant',
         dates: 'Nov 2024 – Nov 2025',
         location: 'Princeton, NJ',
+        highlight: true,
+        tags: ['Analysis', 'Configuration spaces'],
         bullets: [
-          'Conducted research on configuration spaces with Fields Medalist Charles Fefferman.',
+          'Researched configuration spaces with Fields Medalist Charles Fefferman.',
           'Co-authored a paper published in the Transactions of the London Mathematical Society.',
         ],
-        link: {
-          label: 'Read paper (TLMS)',
-          url: 'https://londmathsoc.onlinelibrary.wiley.com/doi/10.1112/tlm3.70024',
-        },
-        highlight: true,
+        links: [
+          {
+            label: 'Paper (TLMS)',
+            url: 'https://londmathsoc.onlinelibrary.wiley.com/doi/10.1112/tlm3.70024',
+          },
+        ],
       },
       {
-        org: 'MIT-PRIMES (Math Track)',
+        org: 'MIT PRIMES · Math Track',
         role: 'Research Scholar',
         dates: 'Nov 2024 – Jan 2026',
+        tags: ['Topology', 'Coxeter groups'],
         bullets: [
-          'Developed algebraic methods for studying the fundamental groups of hyperplane arrangements.',
-          'Mentored by Prof. Nathan Williams (University of Texas at Dallas).',
+          'Developed algebraic methods for fundamental groups of hyperplane arrangement complements.',
+          'Mentored by Prof. Nathan Williams (UT Dallas).',
         ],
+        links: [{ label: 'Project', url: '/projects/pure-braid-groups' }],
       },
     ],
   },
@@ -93,76 +121,73 @@ export const experienceSections: ExperienceSection[] = [
     entries: [
       {
         org: 'Stanford University',
-        role: 'Incoming Undergraduate — Mathematics & Computer Science (double major)',
-        dates: 'Sep 2026 – May 2030',
-        bullets: ['Incoming undergraduate (Fall 2026).'],
+        role: 'B.S. Mathematics',
+        dates: 'Sep 2026 – May 2029',
+        location: 'Stanford, CA',
+        current: true,
+        bullets: [],
       },
       {
         org: 'The Peddie School',
-        role: 'Valedictorian',
+        role: 'Valedictorian · GPA 4.2 / 4.3',
         dates: 'Sep 2022 – May 2026',
+        location: 'Hightstown, NJ',
         bullets: [
           'Advanced coursework: Multivariable Calculus, Linear Algebra, Algorithms & Data Structures.',
           'Princeton University coursework: Real Analysis (A), Fourier Analysis (A), Numerical Analysis (A), Probability & Stochastic Systems (A).',
         ],
       },
-    ],
-  },
-  {
-    id: 'programs',
-    title: 'Programs & Competitions',
-    entries: [
       {
         org: 'Research Science Institute (RSI)',
         role: 'Research Scholar',
         dates: 'Jul 2025 – Aug 2025',
-        bullets: [
-          'Selective summer research program; developed the TriFallNet early fall-detection project.',
-        ],
+        bullets: ['Developed the TriFallNet early fall-detection project.'],
       },
       {
         org: 'Ross Mathematics Program',
         role: 'Participant',
         dates: 'Jul 2024 – Aug 2024',
-        bullets: ['Intensive number theory program focused on mathematical exploration and proof.'],
+        bullets: ['Intensive number theory program built around proof and exploration.'],
       },
-    ],
-  },
-  {
-    id: 'awards',
-    title: 'Awards & Recognition',
-    entries: [
-      {
-        org: 'USA Mathematical Olympiad (USAMO)',
-        role: 'Bronze Medal',
-        dates: '',
-        bullets: ['National-level recognition in mathematical olympiad.'],
-      },
-      {
-        org: 'USA Computing Olympiad (USACO)',
-        role: 'Gold Division',
-        dates: '',
-        bullets: ['Advanced to the Gold division of the national programming olympiad.'],
-      },
-    ],
-  },
-  {
-    id: 'leadership',
-    title: 'Leadership & Clubs',
-    entries: [
-      // TODO: Add leadership roles, clubs, or activities here.
-      // Example shape:
-      // {
-      //   org: 'Math Club',
-      //   role: 'President',
-      //   dates: '2024 – 2026',
-      //   bullets: ['Organized weekly problem-solving sessions.'],
-      // },
     ],
   },
 ];
 
-// Convenience export of highlighted entries for the home page.
+// Honors shown as tiles on the home page and in a list on /experience.
+export interface Award {
+  title: string;
+  detail: string;
+  year?: string;
+  link?: string;
+}
+
+export const awards: Award[] = [
+  {
+    title: 'Ricursive Intelligence Hackathon',
+    detail: 'Winner, for Senju (a swarm of computer-use agents)',
+    year: '2026',
+    link: '/projects/senju',
+  },
+  {
+    title: 'xAI',
+    detail: 'Full-time Exceptional Engineer offer',
+    year: '2026',
+  },
+  {
+    title: 'USA Mathematical Olympiad',
+    detail: 'Bronze Medal',
+  },
+  {
+    title: 'USA Computing Olympiad',
+    detail: 'Gold Division',
+  },
+  {
+    title: 'The Peddie School',
+    detail: 'Valedictorian',
+    year: '2026',
+  },
+];
+
 export const experienceHighlights: ExperienceEntry[] = experienceSections
   .flatMap((section) => section.entries)
   .filter((entry) => entry.highlight);

@@ -10,6 +10,10 @@ export default defineConfig({
   site: 'https://armorfaye.github.io',
   base: '/',
   integrations: [mdx(), sitemap()],
+  // Old URL for the papers page.
+  redirects: {
+    '/writing': '/research',
+  },
   vite: {
     plugins: [tailwindcss()],
   },

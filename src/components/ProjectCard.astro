@@ -1,103 +1,51 @@
 ---
-import Tag from './Tag.astro';
-import Icon from './Icon.astro';
-import { categoryLabel, type CategoryId } from '../data/categories';
-
 interface Props {
   slug: string;
   title: string;
   summary: string;
-  categories: CategoryId[];
-  tags?: string[];
-  role: string;
   dates: string;
   thumbnail?: string;
-  links?: { label: string; url: string; type: string }[];
+  award?: string;
+  size?: 'default' | 'wide';
 }
-const { slug, title, summary, categories, tags = [], role, dates, thumbnail, links = [] } =
-  Astro.props;
+const { slug, title, summary, dates, thumbnail, award, size = 'default' } = Astro.props;
 const href = `/projects/${slug}`;
-// Show only real (non-placeholder) links as quick icons on the card.
-const quickLinks = links.filter((l) => l.url && l.url !== '#').slice(0, 3);
+const year = dates.match(/\d{4}(?!.*\d{4})/)?.[0] ?? dates;
 ---
 
-<article
-  class="group flex flex-col overflow-hidden rounded-xl border border-stone-200 bg-white transition-all duration-300 hover:-translate-y-1 hover:border-accent-400/60 hover:shadow-lg hover:shadow-accent-500/5 dark:border-stone-800 dark:bg-stone-900/60"
+<a
+  href={href}
+  class:list={['group block', size === 'wide' && 'md:grid md:grid-cols-[1.15fr_1fr] md:items-center md:gap-10']}
 >
-  <a href={href} class="group/image block overflow-hidden" tabindex="-1" aria-hidden="true">
-    <div class="relative aspect-[16/9] overflow-hidden bg-stone-100 dark:bg-stone-800">
-      {
-        thumbnail ? (
-          <>
-            <img
-              src={thumbnail}
-              alt=""
-              loading="lazy"
-              decoding="async"
-              class="h-full w-full object-cover transition-transform duration-500 group-hover/image:scale-[1.04]"
-            />
-            <div
-              class="pointer-events-none absolute inset-0 bg-gradient-to-t from-stone-900/50 via-transparent to-transparent opacity-60 transition-opacity group-hover:opacity-80 dark:from-stone-950/70"
-              aria-hidden="true"
-            />
-          </>
-        ) : (
-          <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-accent-600/20 via-accent-500/10 to-stone-200 dark:to-stone-800">
-            <span class="font-serif text-5xl text-accent-700/80 dark:text-accent-400/80">
-              {title.charAt(0)}
-            </span>
-          </div>
-        )
-      }
-    </div>
-  </a>
-
-  <div class="flex flex-1 flex-col p-5">
-    <div class="mb-2 flex flex-wrap gap-1.5">
-      {categories.map((c) => <Tag variant="solid">{categoryLabel(c)}</Tag>)}
-    </div>
-
-    <h3 class="font-serif text-xl text-stone-900 dark:text-stone-100">
-      <a href={href} class="transition-colors hover:text-accent-600 dark:hover:text-accent-400">
-        {title}
-      </a>
-    </h3>
-
-    <p class="mt-2 flex-1 text-sm leading-relaxed text-stone-600 dark:text-stone-400">
-      {summary}
-    </p>
-
-    <div class="mt-4 flex items-center justify-between gap-3 text-xs text-stone-500 dark:text-stone-500">
-      <span class="truncate" title={role}>{role}</span>
-      <span class="shrink-0">{dates}</span>
-    </div>
-
+  <div class="overflow-hidden rounded-xl border border-line bg-void transition-colors duration-200 group-hover:border-line-strong">
     {
-      (tags.length > 0 || quickLinks.length > 0) && (
-        <div class="mt-4 flex items-center justify-between gap-3 border-t border-stone-100 pt-4 dark:border-stone-800">
-          <div class="flex flex-wrap gap-1.5">
-            {tags.slice(0, 3).map((t) => (
-              <Tag>{t}</Tag>
-            ))}
-          </div>
-          {quickLinks.length > 0 && (
-            <div class="flex shrink-0 items-center gap-1">
-              {quickLinks.map((link) => (
-                <a
-                  href={link.url}
-                  target={link.url.startsWith('http') ? '_blank' : undefined}
-                  rel={link.url.startsWith('http') ? 'noopener noreferrer' : undefined}
-                  class="inline-flex h-7 w-7 items-center justify-center rounded text-stone-500 transition-colors hover:bg-stone-100 hover:text-accent-600 dark:hover:bg-stone-800 dark:hover:text-accent-400"
-                  aria-label={link.label}
-                  title={link.label}
-                >
-                  <Icon name={link.type} class="h-4 w-4" />
-                </a>
-              ))}
-            </div>
-          )}
-        </div>
+      thumbnail && (
+        <img
+          src={thumbnail}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          class="aspect-[16/9] w-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+        />
       )
     }
   </div>
-</article>
+
+  <div class:list={['mt-5', size === 'wide' && 'md:mt-0']}>
+    <p class="text-sm text-faint">
+      {year}
+      {award && <span class="text-accent-400"> · {award}</span>}
+    </p>
+    <h3
+      class:list={[
+        'mt-1.5 font-semibold leading-snug text-ink transition-colors group-hover:text-accent-300',
+        size === 'wide' ? 'text-2xl sm:text-[1.75rem]' : 'text-xl',
+      ]}
+    >
+      {title}
+    </h3>
+    <p class:list={['mt-2.5 leading-relaxed text-muted', size === 'wide' ? 'text-[1.02rem]' : 'line-clamp-3 text-[0.97rem]']}>
+      {summary}
+    </p>
+  </div>
+</a>

@@ -1,6 +1,6 @@
 # Documents
 
-PDFs and other files linked from the **Writing** page and project pages live here.
+PDFs and other files linked from the **Research** page and project pages live here.
 
 ## Current files
 
@@ -14,7 +14,8 @@ PDFs and other files linked from the **Writing** page and project pages live her
 
 1. Drop the PDF in this folder. Keep file names simple (no spaces): use
    underscores, e.g. `My_Paper_2026.pdf`.
-2. Reference it from `src/data/documents.ts` (Writing page) or from a project's
+2. Reference it from `src/data/publications.ts` (Research page: a paper's `links`
+   or the `posters` list) or from a project's
    `links` array in `src/content/projects/<slug>.mdx`.
 3. The URL is the path under `public`, so `public/docs/My_Paper.pdf` is linked as
    `/docs/My_Paper.pdf`.

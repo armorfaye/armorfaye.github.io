@@ -4,94 +4,156 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/Hero.astro';
 import SectionHeader from '../components/SectionHeader.astro';
 import ProjectCard from '../components/ProjectCard.astro';
+import PublicationItem from '../components/PublicationItem.astro';
 import ExperienceItem from '../components/ExperienceItem.astro';
-import DocumentCard from '../components/DocumentCard.astro';
-import { skillGroups } from '../data/skills';
-import { experienceHighlights } from '../data/experience';
-import { documents } from '../data/documents';
+import SenjuShowcase from '../components/SenjuShowcase.astro';
+import { experienceHighlights, awards } from '../data/experience';
+import { publications } from '../data/publications';
 
-const allProjects = await getCollection('projects');
-const featured = allProjects
-  .filter((p) => p.data.featured)
-  .sort((a, b) => a.data.order - b.data.order);
+const all = await getCollection('projects');
+const projects = all.filter((p) => p.data.featured && p.id !== 'senju').sort((a, b) => a.data.order - b.data.order);
+const senju = all.find((p) => p.id === 'senju')!;
 
-const featuredDocs = documents.filter((d) => d.featured).slice(0, 3);
+const now = [
+  {
+    where: 'Stanford NLP, Percy Liang’s group',
+    title: 'Priced-guidance RL',
+    body: 'Building a guidance-based pipeline for data creation and RL environment generation, and contributing to the next Marin pretraining architecture (~600B).',
+    href: 'https://marin.community',
+    cta: 'marin.community',
+  },
+  {
+    where: 'Hazy Research, with Hermann Kumbong',
+    title: 'Speculative decoding for NCM',
+    body: 'Speeding up Next-Concept Modeling, which generates text coarse-to-fine, level by level in parallel, instead of one token at a time.',
+    href: 'https://hazyresearch.stanford.edu/blog/2026-10-12-ncm',
+    cta: 'About NCM',
+  },
+  {
+    where: 'Hackathon winner',
+    title: 'Senju 千手',
+    body: 'A swarm of computer-use agents with their own cursors, working in your real apps while you keep working.',
+    href: '/projects/senju',
+    cta: 'Project page',
+  },
+];
 ---
 
 <BaseLayout>
   <Hero />
 
-  <!-- Featured projects -->
-  <section class="mx-auto max-w-5xl px-4 py-16 sm:px-6">
-    <SectionHeader
-      eyebrow="Selected work"
-      title="Featured projects"
-      subtitle="A few projects that best capture how I think about research and engineering."
-      link={{ label: 'All projects', href: '/projects' }}
-    />
-    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+  <!-- Now -->
+  <section class="container-x pt-16">
+    <SectionHeader eyebrow="Now" title="What I’m working on" />
+    <div class="grid gap-x-10 gap-y-10 md:grid-cols-3">
       {
-        featured.map((p) => (
-          <ProjectCard
-            slug={p.id}
-            title={p.data.title}
-            summary={p.data.summary}
-            categories={p.data.categories}
-            tags={p.data.tags}
-            role={p.data.role}
-            dates={p.data.dates}
-            thumbnail={p.data.thumbnail}
-            links={p.data.links}
-          />
-        ))
+        now.map((n, i) => {
+          const external = n.href.startsWith('http');
+          return (
+            <div class="reveal border-t border-line-strong pt-5" style={`--delay: ${i * 80}ms`}>
+              <p class="text-sm text-faint">{n.where}</p>
+              <h3 class="mt-2 text-lg font-semibold text-ink">{n.title}</h3>
+              <p class="mt-2 text-[0.97rem] leading-relaxed text-muted">{n.body}</p>
+              <a
+                href={n.href}
+                target={external ? '_blank' : undefined}
+                rel={external ? 'noopener noreferrer' : undefined}
+                class="mt-4 inline-block text-sm text-accent-400 transition-colors hover:text-accent-300"
+              >
+                {n.cta} {external ? '↗' : '→'}
+              </a>
+            </div>
+          );
+        })
       }
     </div>
   </section>
 
-  <!-- Experience highlights -->
-  <section class="mx-auto max-w-5xl px-4 py-16 sm:px-6">
-    <SectionHeader
-      eyebrow="Research & industry"
-      title="Selected highlights"
-      subtitle="Where I've done research and the recognition that has come with it."
-      link={{ label: 'Full experience', href: '/experience' }}
-    />
-    <ul class="space-y-8 border-l border-stone-200 pl-2 dark:border-stone-800">
-      {experienceHighlights.map((entry) => <ExperienceItem entry={entry} />)}
-    </ul>
+  <!-- Senju -->
+  <section class="container-x pt-32">
+    <div class="grid items-center gap-12 lg:grid-cols-[1fr_1.2fr] lg:gap-14">
+      <div class="reveal min-w-0">
+        <p class="eyebrow">Featured project · Hackathon winner</p>
+        <h2 class="mt-2 text-3xl font-semibold text-ink sm:text-4xl">Senju 千手</h2>
+        <p class="mt-1 text-lg text-muted">A thousand hands on your desktop</p>
+        <p class="mt-6 text-[1.05rem] leading-relaxed text-ink-soft">
+          Type one goal and a lead agent splits it across a swarm of Claude agents. Each one gets its
+          own cursor and works in your real browser and Mac apps, while your mouse and keyboard stay
+          yours. You can step in on any agent mid-task, and nothing is sent in your name without your
+          approval. When a job finishes, the lead saves what it learned as a skill for next time.
+        </p>
+        <p class="mt-4 text-[0.97rem] text-muted">
+          Won the Ricursive Intelligence Hackathon.
+        </p>
+        <div class="mt-8 flex flex-wrap items-center gap-3">
+          <a href="/projects/senju" class="btn-primary">How it works</a>
+          {
+            senju.data.links.map((l) => (
+              <a href={l.url} target="_blank" rel="noopener noreferrer" class="btn-secondary">
+                {l.label}
+              </a>
+            ))
+          }
+        </div>
+      </div>
+      <div class="reveal min-w-0" style="--delay: 120ms">
+        <SenjuShowcase />
+      </div>
+    </div>
   </section>
 
-  <!-- Skills -->
-  <section class="mx-auto max-w-5xl px-4 py-16 sm:px-6">
-    <SectionHeader eyebrow="Toolkit" title="Technical stack" />
-    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+  <!-- Projects -->
+  <section class="container-x pt-32">
+    <SectionHeader eyebrow="Projects" title="Selected work" link={{ label: 'All projects', href: '/projects' }} />
+    <div class="grid gap-x-8 gap-y-14 md:grid-cols-2">
       {
-        skillGroups.map((group) => (
-          <div class="rounded-xl border border-stone-200 bg-white p-5 transition-all duration-200 hover:border-accent-400/40 hover:shadow-md hover:shadow-accent-500/5 dark:border-stone-800 dark:bg-stone-900/60 dark:hover:border-accent-500/30">
-            <h3 class="mb-3 text-sm font-semibold uppercase tracking-wide text-accent-700 dark:text-accent-400">
-              {group.label}
-            </h3>
-            <ul class="space-y-1.5 text-sm text-stone-600 dark:text-stone-400">
-              {group.items.map((item) => (
-                <li>{item}</li>
-              ))}
-            </ul>
+        projects.map((p, i) => (
+          <div class="reveal" style={`--delay: ${(i % 2) * 80}ms`}>
+            <ProjectCard
+              slug={p.id}
+              title={p.data.title}
+              summary={p.data.summary}
+              dates={p.data.dates}
+              thumbnail={p.data.thumbnail}
+              award={p.data.award}
+            />
           </div>
         ))
       }
     </div>
   </section>
 
-  <!-- Recent writing / documents -->
-  <section class="mx-auto max-w-5xl px-4 py-16 sm:px-6">
-    <SectionHeader
-      eyebrow="Reading"
-      title="Selected documents"
-      subtitle="Papers, posters, and blog posts from my research."
-      link={{ label: 'All writing', href: '/writing' }}
-    />
-    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {featuredDocs.map((doc) => <DocumentCard doc={doc} />)}
+  <!-- Publications -->
+  <section class="container-x pt-32">
+    <SectionHeader eyebrow="Publications" title="Papers" link={{ label: 'All research', href: '/research' }} />
+    <div class="reveal border-b border-line">
+      {publications.map((pub) => <PublicationItem pub={pub} compact />)}
     </div>
+  </section>
+
+  <!-- Experience -->
+  <section class="container-x pt-32">
+    <SectionHeader eyebrow="Experience" title="Where I’ve worked" link={{ label: 'Full experience', href: '/experience' }} />
+    <ul class="border-b border-line">
+      {experienceHighlights.map((entry, i) => <ExperienceItem entry={entry} delay={i * 50} showBullets={false} />)}
+    </ul>
+  </section>
+
+  <!-- Honors -->
+  <section class="container-x pt-24">
+    <SectionHeader eyebrow="Honors" title="Recognition" />
+    <ul class="reveal border-b border-line">
+      {
+        awards.map((a) => (
+          <li class="grid gap-1 border-t border-line py-5 sm:grid-cols-[10rem_1fr] sm:gap-6">
+            <p class="text-sm tabular-nums text-faint">{a.year ?? ''}</p>
+            <p class="text-[1.02rem] text-ink">
+              {a.link ? <a href={a.link} class="font-semibold transition-colors hover:text-accent-300">{a.title}</a> : <span class="font-semibold">{a.title}</span>}
+              <span class="text-muted"> · {a.detail}</span>
+            </p>
+          </li>
+        ))
+      }
+    </ul>
   </section>
 </BaseLayout>

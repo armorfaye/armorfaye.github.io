@@ -1,0 +1,121 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionHeader from '../components/SectionHeader.astro';
+import PublicationItem from '../components/PublicationItem.astro';
+import { publications, posters, areaLabel } from '../data/publications';
+import { experienceSections } from '../data/experience';
+import { site } from '../data/site';
+
+const current = experienceSections
+  .flatMap((s) => s.entries)
+  .filter((e) => e.current && e.links && e.links.length > 0);
+
+const sorted = [...publications].sort((a, b) => b.year - a.year);
+
+const filters = [
+  { id: 'all', label: 'All' },
+  ...(['math', 'ml'] as const).map((a) => ({ id: a, label: areaLabel[a] })),
+];
+---
+
+<BaseLayout
+  title="Research"
+  description="Publications and ongoing research of Jiayu (Jerry) Liu: configuration spaces with Charles Fefferman, hyperplane arrangements, fall detection, topological data analysis, and LLM research at Stanford."
+>
+  <div class="container-x pt-14">
+    <SectionHeader
+      as="h1"
+      title="Research"
+      subtitle="I work across pure mathematics (topology, analysis, Coxeter groups) and machine learning (LLMs, pose, multimodal, topological ML). Every paper below links to the full text."
+    />
+
+    <div class="reveal flex flex-wrap gap-3">
+      <a href={site.resume} class="btn-primary">CV</a>
+    </div>
+
+    <!-- Ongoing -->
+    <section class="mt-20">
+      <h2 class="reveal text-xl font-semibold text-ink">Ongoing</h2>
+      <div class="mt-6 grid gap-x-10 gap-y-10 md:grid-cols-2">
+        {
+          current.map((e, i) => (
+            <div class="reveal border-t border-line-strong pt-5" style={`--delay: ${i * 80}ms`}>
+              <p class="text-sm text-faint">{e.org}</p>
+              <h3 class="mt-2 text-lg font-semibold text-ink">{e.role}</h3>
+              <ul class="mt-2 space-y-1.5 text-[0.97rem] leading-relaxed text-muted">
+                {e.bullets.map((b) => <li>{b}</li>)}
+              </ul>
+              <p class="mt-4 flex flex-wrap gap-x-4 text-sm">
+                {e.links!.map((l) => (
+                  <a href={l.url} target="_blank" rel="noopener noreferrer" class="text-accent-400 transition-colors hover:text-accent-300">
+                    {l.label} ↗
+                  </a>
+                ))}
+              </p>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <!-- Publications -->
+    <section class="mt-24">
+      <div class="reveal mb-4 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <h2 class="text-xl font-semibold text-ink">Publications</h2>
+        <div class="flex gap-5 text-[0.92rem]" role="group" aria-label="Filter by area">
+          {
+            filters.map((f, i) => (
+              <button
+                type="button"
+                data-filter={f.id}
+                aria-pressed={i === 0 ? 'true' : 'false'}
+                class="pub-filter text-muted underline-offset-[6px] transition-colors hover:text-ink aria-pressed:text-ink aria-pressed:underline aria-pressed:decoration-accent-400"
+              >
+                {f.label}
+              </button>
+            ))
+          }
+        </div>
+      </div>
+
+      <div class="reveal border-b border-line">
+        {
+          sorted.map((pub) => (
+            <div class="pub" data-area={pub.area}>
+              <PublicationItem pub={pub} />
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <!-- Posters -->
+    <section class="mt-24">
+      <h2 class="reveal text-xl font-semibold text-ink">Posters & documents</h2>
+      <ul class="reveal mt-4 border-b border-line">
+        {
+          posters.map((p) => (
+            <li class="border-t border-line">
+              <a href={p.url} class="group flex flex-col gap-1 py-5 sm:flex-row sm:items-baseline sm:justify-between">
+                <span class="font-medium text-ink transition-colors group-hover:text-accent-300">{p.title}</span>
+                <span class="text-sm text-faint">{p.venue} · PDF</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+  </div>
+
+  <script>
+    const buttons = document.querySelectorAll<HTMLButtonElement>('.pub-filter');
+    const pubs = document.querySelectorAll<HTMLElement>('.pub');
+    buttons.forEach((btn) =>
+      btn.addEventListener('click', () => {
+        const f = btn.dataset.filter ?? 'all';
+        buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+        pubs.forEach((p) => p.classList.toggle('hidden', f !== 'all' && p.dataset.area !== f));
+      }),
+    );
+  </script>
+</BaseLayout>

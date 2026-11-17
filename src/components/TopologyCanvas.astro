@@ -1,0 +1,238 @@
+---
+// Morphing 3D point cloud: torus → trefoil knot → Klein bottle → sphere.
+// Each shape is a parametric surface over the same (u, v) grid, so points
+// interpolate smoothly between them. Pauses off-screen and respects reduced motion.
+interface Props {
+  class?: string;
+  showLabel?: boolean;
+}
+const { class: className = '', showLabel = false } = Astro.props;
+---
+
+<div class:list={['topology pointer-events-none', className]} aria-hidden="true">
+  <canvas class="h-full w-full"></canvas>
+  {
+    showLabel && (
+      <p class="topology-label absolute bottom-[14%] right-[6%] text-xs text-faint">
+        T² · torus
+      </p>
+    )
+  }
+</div>
+
+<script>
+  type Vec = [number, number, number];
+  type Shape = { name: string; f: (u: number, v: number) => Vec };
+
+  const TAU = Math.PI * 2;
+  const NU = 150;
+  const NV = 14;
+
+  const trefoil = (t: number): Vec => [
+    Math.sin(t) + 2 * Math.sin(2 * t),
+    Math.cos(t) - 2 * Math.cos(2 * t),
+    -Math.sin(3 * t),
+  ];
+  const sub = (a: Vec, b: Vec): Vec => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+  const cross = (a: Vec, b: Vec): Vec => [
+    a[1] * b[2] - a[2] * b[1],
+    a[2] * b[0] - a[0] * b[2],
+    a[0] * b[1] - a[1] * b[0],
+  ];
+  const norm = (a: Vec): Vec => {
+    const l = Math.hypot(a[0], a[1], a[2]) || 1;
+    return [a[0] / l, a[1] / l, a[2] / l];
+  };
+
+  const shapes: Shape[] = [
+    {
+      name: 'T² · torus',
+      f: (u, v) => {
+        const R = 1,
+          r = 0.42;
+        return [(R + r * Math.cos(v)) * Math.cos(u), (R + r * Math.cos(v)) * Math.sin(u), r * Math.sin(v)];
+      },
+    },
+    {
+      name: 'trefoil knot',
+      f: (u, v) => {
+        const h = 0.002;
+        const c = trefoil(u);
+        const T = norm(sub(trefoil(u + h), trefoil(u - h)));
+        const N = norm(cross(T, [0, 0, 1]));
+        const B = cross(T, N);
+        const r = 0.42;
+        const p: Vec = [
+          c[0] + r * (Math.cos(v) * N[0] + Math.sin(v) * B[0]),
+          c[1] + r * (Math.cos(v) * N[1] + Math.sin(v) * B[1]),
+          c[2] + r * (Math.cos(v) * N[2] + Math.sin(v) * B[2]),
+        ];
+        return [p[0] / 2.6, p[1] / 2.6, p[2] / 2.6];
+      },
+    },
+    {
+      name: 'K · klein bottle',
+      f: (u, v) => {
+        const a = 2.2;
+        const w = a + Math.cos(u / 2) * Math.sin(v) - Math.sin(u / 2) * Math.sin(2 * v);
+        return [
+          (w * Math.cos(u)) / 2.6,
+          (w * Math.sin(u)) / 2.6,
+          (Math.sin(u / 2) * Math.sin(v) + Math.cos(u / 2) * Math.sin(2 * v)) / 2.6,
+        ];
+      },
+    },
+    {
+      name: 'S² · sphere',
+      f: (u, v) => {
+        const phi = (v / TAU) * Math.PI * 0.98 + 0.03;
+        const r = 1.12;
+        return [r * Math.sin(phi) * Math.cos(u), r * Math.sin(phi) * Math.sin(u), r * Math.cos(phi)];
+      },
+    },
+  ];
+
+  // Precompute every shape on the shared grid.
+  const count = NU * NV;
+  const buffers = shapes.map((s) => {
+    const arr = new Float32Array(count * 3);
+    let i = 0;
+    for (let a = 0; a < NU; a++) {
+      for (let b = 0; b < NV; b++) {
+        const u = (a / NU) * TAU;
+        const v = (b / NV) * TAU + (a % 2) * (Math.PI / NV); // stagger rows
+        const p = s.f(u, v);
+        arr[i++] = p[0];
+        arr[i++] = p[1];
+        arr[i++] = p[2];
+      }
+    }
+    return arr;
+  });
+
+  const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+
+  document.querySelectorAll<HTMLElement>('.topology').forEach((root) => {
+    const canvas = root.querySelector('canvas')!;
+    const label = root.querySelector<HTMLElement>('.topology-label');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let w = 0,
+      h = 0,
+      dpr = 1;
+    const resize = () => {
+      const r = canvas.getBoundingClientRect();
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = r.width;
+      h = r.height;
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      if (reduced) draw(0);
+    };
+
+    let mx = 0,
+      my = 0,
+      tx = 0,
+      ty = 0;
+    window.addEventListener(
+      'pointermove',
+      (e) => {
+        tx = (e.clientX / window.innerWidth - 0.5) * 0.9;
+        ty = (e.clientY / window.innerHeight - 0.5) * 0.6;
+      },
+      { passive: true },
+    );
+
+    const HOLD = 4200;
+    const MORPH = 1800;
+    const CYCLE = HOLD + MORPH;
+    const cur = new Float32Array(count * 3);
+    let lastShape = -1;
+
+    function draw(time: number) {
+      const step = Math.floor(time / CYCLE);
+      const local = time - step * CYCLE;
+      const from = step % shapes.length;
+      const to = (from + 1) % shapes.length;
+      const k = local < HOLD ? 0 : ease((local - HOLD) / MORPH);
+      const A = buffers[from],
+        B = buffers[to];
+      for (let i = 0; i < cur.length; i++) cur[i] = A[i] + (B[i] - A[i]) * k;
+
+      const showing = k > 0.5 ? to : from;
+      if (label && showing !== lastShape) {
+        label.textContent = shapes[showing].name;
+        lastShape = showing;
+      }
+
+      mx += (tx - mx) * 0.04;
+      my += (ty - my) * 0.04;
+      const ay = time * 0.00018 + mx;
+      const ax = 1.05 + my + Math.sin(time * 0.0001) * 0.15;
+      const cy = Math.cos(ay),
+        sy = Math.sin(ay);
+      const cx = Math.cos(ax),
+        sx = Math.sin(ax);
+
+      ctx!.clearRect(0, 0, w, h);
+      ctx!.globalCompositeOperation = 'lighter';
+      const scale = Math.min(w, h) * 0.36;
+      const ox = w / 2,
+        oy = h / 2;
+      const cam = 3.4;
+
+      for (let i = 0; i < count; i++) {
+        const x = cur[i * 3],
+          y = cur[i * 3 + 1],
+          z = cur[i * 3 + 2];
+        // rotate Y then X
+        const x1 = x * cy + z * sy;
+        const z1 = -x * sy + z * cy;
+        const y2 = y * cx - z1 * sx;
+        const z2 = y * sx + z1 * cx;
+        const p = cam / (cam - z2);
+        const px = ox + x1 * scale * p;
+        const py = oy + y2 * scale * p;
+        const depth = (z2 + 1.3) / 2.6; // ~0..1, near = 1
+        const a = 0.12 + depth * 0.75;
+        const s = 0.6 + depth * 1.7;
+        ctx!.fillStyle = `rgba(${Math.round(40 + depth * 80)}, ${Math.round(200 + depth * 50)}, ${Math.round(110 + depth * 40)}, ${a})`;
+        ctx!.fillRect(px - s / 2, py - s / 2, s, s);
+      }
+      ctx!.globalCompositeOperation = 'source-over';
+    }
+
+    let raf = 0;
+    let running = false;
+    let start = performance.now();
+    let elapsed = 0;
+    const loop = (now: number) => {
+      draw(Math.max(0, elapsed + (now - start)));
+      raf = requestAnimationFrame(loop);
+    };
+    const play = () => {
+      if (running || reduced) return;
+      running = true;
+      start = performance.now();
+      raf = requestAnimationFrame(loop);
+    };
+    const pause = () => {
+      if (!running) return;
+      running = false;
+      elapsed = Math.max(0, elapsed + performance.now() - start);
+      cancelAnimationFrame(raf);
+    };
+
+    new ResizeObserver(resize).observe(canvas);
+    resize();
+    if (reduced) {
+      draw(0);
+      return;
+    }
+    new IntersectionObserver(([e]) => (e.isIntersecting ? play() : pause())).observe(root);
+    document.addEventListener('visibilitychange', () => (document.hidden ? pause() : play()));
+  });
+</script>

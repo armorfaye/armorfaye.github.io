@@ -17,6 +17,8 @@ const projects = defineCollection({
     role: text(),
     dates: text(),
     featured: z.boolean().default(false),
+    // Optional honor shown as a badge on cards and the project header.
+    award: text().optional(),
     order: z.number().default(99),
     thumbnail: z.string().optional(),
     stack: z.array(text()).default([]),
@@ -34,16 +36,4 @@ const projects = defineCollection({
   }),
 });
 
-// Blog posts for /blog. Add a new .mdx file in src/content/blog/ to publish.
-const blog = defineCollection({
-  loader: glob({ pattern: '**/*.mdx', base: './src/content/blog' }),
-  schema: z.object({
-    title: text(),
-    summary: text(),
-    date: z.coerce.date(),
-    tags: z.array(text()).default([]),
-    featured: z.boolean().default(false),
-  }),
-});
-
-export const collections = { projects, blog };
+export const collections = { projects };

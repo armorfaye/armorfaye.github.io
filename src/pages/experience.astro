@@ -2,38 +2,46 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import SectionHeader from '../components/SectionHeader.astro';
 import ExperienceItem from '../components/ExperienceItem.astro';
-import { experienceSections } from '../data/experience';
+import { experienceSections, awards } from '../data/experience';
+import { site } from '../data/site';
 
-// Hide sections with no entries (e.g. an empty Leadership placeholder).
 const sections = experienceSections.filter((s) => s.entries.length > 0);
 ---
 
-<BaseLayout
-  title="Experience"
-  description="Research, industry, education, programs, and awards of Jiayu (Jerry) Liu."
->
-  <div class="mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16">
-    <SectionHeader
-      eyebrow="Timeline"
-      title="Experience"
-      subtitle="Research, industry, education, and the programs and awards along the way."
-    />
+<BaseLayout title="Experience" description="Research, industry, education, and honors of Jiayu (Jerry) Liu.">
+  <div class="container-x pt-14">
+    <SectionHeader as="h1" title="Experience" subtitle="Research, industry, and education, newest first." link={{ label: 'Resume (PDF)', href: site.resume }} />
 
-    <div class="space-y-14">
+    <div class="space-y-20">
       {
         sections.map((section) => (
           <section>
-            <h2 class="mb-6 text-sm font-semibold uppercase tracking-widest text-accent-700 dark:text-accent-400">
-              {section.title}
-            </h2>
-            <ul class="space-y-8 border-l border-stone-200 dark:border-stone-800">
-              {section.entries.map((entry) => (
-                <ExperienceItem entry={entry} />
+            <h2 class="reveal mb-4 text-xl font-semibold text-ink">{section.title}</h2>
+            <ul class="border-b border-line">
+              {section.entries.map((entry, i) => (
+                <ExperienceItem entry={entry} delay={i * 40} />
               ))}
             </ul>
           </section>
         ))
       }
+
+      <section>
+        <h2 class="reveal mb-4 text-xl font-semibold text-ink">Honors</h2>
+        <ul class="reveal border-b border-line">
+          {
+            awards.map((a) => (
+              <li class="grid gap-1 border-t border-line py-5 sm:grid-cols-[10rem_1fr] sm:gap-6">
+                <p class="text-sm tabular-nums text-faint">{a.year ?? ''}</p>
+                <p class="text-[1.02rem] text-ink">
+                  {a.link ? <a href={a.link} class="font-semibold transition-colors hover:text-accent-300">{a.title}</a> : <span class="font-semibold">{a.title}</span>}
+                  <span class="text-muted"> · {a.detail}</span>
+                </p>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
     </div>
   </div>
 </BaseLayout>

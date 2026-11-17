@@ -1,0 +1,82 @@
+---
+title: 'Senju 千手: A Thousand Hands on Your Desktop'
+summary: 'A Mac app that runs a swarm of Claude computer-use agents, each with its own ghost cursor, in your real browser and apps while you keep working. A lead agent plans and replans, workers act through MCP, and every job ends with a retrospective saved as a reusable skill. Won the Ricursive Intelligence Hackathon.'
+abstract: 'Senju (千手, “a thousand hands”) turns one prompt into a coordinated swarm of computer-use agents. You type a goal into a bar at the top of the screen. A lead agent splits it into tasks, spawns workers, and watches their progress. Each worker drives your real Mac through MCP servers (Playwright for the browser, a filesystem server, and Cua Driver for desktop apps), and a ghost cursor shows where it is working. Your own mouse and keyboard stay free the whole time. You can interrupt any agent, take over its window, or hand it back, and anything sent in your name waits for your approval.'
+categories: ['ai-ml', 'software-systems']
+tags: ['Agents', 'Computer Use', 'Claude', 'MCP', 'Electron', 'Multiplayer']
+role: 'Co-creator'
+dates: '2026'
+featured: true
+award: 'Winner · Ricursive Intelligence Hackathon'
+order: 0
+thumbnail: '/images/projects/senju.svg'
+stack: ['Node.js', 'Electron', 'Claude API', 'MCP', 'Playwright', 'Cua Driver', 'Supabase', 'Fly.io']
+results:
+  - 'Won the Ricursive Intelligence Hackathon.'
+  - 'A lead agent plans, spawns workers, waits on their events, and replans or stops them as the job changes.'
+  - 'Workers run in your real browser and desktop apps, each shown by its own ghost cursor, without taking your mouse or keyboard.'
+  - 'Team mode shares one session across several Macs, with per-session permission from each Mac’s owner.'
+  - 'After each job, the lead writes a retrospective and saves it as a plain-Markdown skill that later jobs reuse.'
+learned:
+  - 'With many agents running at once, the hard problem is coordination: who owns which window, when to wait, and when to replan.'
+  - 'Users trust agents they can interrupt. Approval gates and visible cursors mattered as much as raw capability.'
+  - 'Saving what worked as editable Markdown skills is a simple, inspectable kind of self-improvement.'
+links:
+  - { label: 'Website', url: 'https://senju-website.vercel.app', type: 'site' }
+---
+
+## The idea
+
+Most computer-use agents borrow your machine. They take the mouse and the
+keyboard, and you wait. Senju runs **many agents at once next to you**. Each
+one has its own cursor and its own window, and you keep working the whole time.
+
+Press <kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>Space</kbd>, type a goal, and a swarm goes
+to work.
+
+## How it works
+
+### Lead and workers
+
+- **Lead agent.** Plans the job, spawns workers, waits for their events, and
+  replans or stops them when something changes.
+- **Workers.** Each worker runs its own Claude tool loop over MCP. Workers can
+  hand a step back to you, wait on one another, flag a change of plan, and post
+  to a shared board.
+- **Ghost cursors.** A transparent overlay draws a cursor for every agent, so
+  you can see who is doing what without losing control of your own.
+
+### Tools via MCP
+
+Workers act through Model Context Protocol servers:
+**Playwright** for the browser, a **filesystem** server, and **Cua Driver** for
+native desktop apps.
+
+### You stay in charge
+
+- **Interruptible.** Message the lead or any worker mid-task and the swarm
+  replans. Pause an agent, take over its window, and hand it back.
+- **Approval gates.** Sign-ins, and anything sent in your name, wait for your
+  click.
+- **Your key, your Mac.** Agents run on your own Anthropic API key, which stays
+  on your machine.
+
+## Multiplayer
+
+In team mode, one agent can read on your Mac and write on a teammate’s. Its
+cursor docks on every screen while it rests and moves to whichever screen it is
+called to. Each owner grants permission per session, requests only go to the
+person they concern, and shared knowledge is credited to its source.
+
+## It gets better at your work
+
+When a job ends, the lead writes a short retrospective and saves what it learned
+as a **skill**, a plain Markdown file you can read, edit, or delete. The next
+similar job starts from that file. In a team, skills are shared and every
+revision is kept.
+
+## Under the hood
+
+- Long-running jobs use context compaction and a token budget.
+- Every job writes traces: a readable timeline plus per-agent JSONL logs.
+- A demo mode runs without an API key.

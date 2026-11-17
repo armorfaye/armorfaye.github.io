@@ -1,0 +1,70 @@
+---
+import { selfNames, type Publication } from '../data/publications';
+
+interface Props {
+  pub: Publication;
+  compact?: boolean;
+}
+const { pub, compact = false } = Astro.props;
+---
+
+<article class="grid gap-1 border-t border-line py-7 sm:grid-cols-[4.5rem_1fr] sm:gap-6" data-area={pub.area}>
+  <p class="text-sm tabular-nums text-faint sm:pt-1">{pub.year}</p>
+
+  <div class="min-w-0">
+    <h3 class="text-lg font-semibold leading-snug text-ink">
+      {
+        pub.project ? (
+          <a href={`/projects/${pub.project}`} class="transition-colors hover:text-accent-300">
+            {pub.title}
+          </a>
+        ) : (
+          <a href={pub.links[0]?.url} target="_blank" rel="noopener noreferrer" class="transition-colors hover:text-accent-300">
+            {pub.title}
+          </a>
+        )
+      }
+    </h3>
+
+    <p class="mt-1.5 text-[0.95rem] text-muted">
+      {
+        pub.authors.map((a, i) => (
+          <>
+            <span class:list={[selfNames.includes(a) && 'font-medium text-ink']}>{a}</span>
+            {i < pub.authors.length - 1 && ', '}
+          </>
+        ))
+      }
+    </p>
+    <p class="mt-0.5 text-[0.95rem] italic text-faint">
+      {pub.venue}{pub.highlight && <span class="not-italic text-accent-400"> · {pub.highlight}</span>}
+    </p>
+
+    {!compact && <p class="mt-3 max-w-2xl text-[0.97rem] leading-relaxed text-ink-soft">{pub.blurb}</p>}
+
+    <p class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm">
+      {
+        pub.links.map((l) => {
+          const external = l.url.startsWith('http');
+          return (
+            <a
+              href={l.url}
+              target={external ? '_blank' : undefined}
+              rel={external ? 'noopener noreferrer' : undefined}
+              class="text-accent-400 transition-colors hover:text-accent-300"
+            >
+              {l.label}
+            </a>
+          );
+        })
+      }
+      {
+        pub.project && (
+          <a href={`/projects/${pub.project}`} class="text-muted transition-colors hover:text-ink">
+            Project →
+          </a>
+        )
+      }
+    </p>
+  </div>
+</article>
