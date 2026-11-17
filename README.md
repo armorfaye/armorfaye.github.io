@@ -102,8 +102,8 @@ Everything you'll edit regularly lives in `src/data/` and `src/content/`.
   `public/docs/README.md`.
 - Put images in `public/images/` (project thumbnails in
   `public/images/projects/`). See `public/images/README.md`.
-- `public/images/profile-light.jpg` is the portrait used in the home intro
-  (the original studio photo, `profile.png`, with its white background matched to the page color).
+- `public/images/profile-photo.jpg` is the portrait used in the home intro
+  (a studio photo with its white background matched to the page color).
 - The social-share image is `public/images/og-default.png` (1200×630), a screenshot of the home page.
 
 > Keep private or sensitive documents out of `public/` — everything there is

@@ -6,7 +6,7 @@ Static images served at `/images/...`.
 
 - `og-default.png` — default social-share (Open Graph) image, 1200×630: a screenshot
   of the top of the home page. Re-capture it after changing the hero.
-- `profile-light.jpg` — portrait used in the home intro (background matched to the page).
+- `profile-photo.jpg` — portrait used in the home intro (background matched to the page).
 - `profile.png` — the original studio photo (white background), kept as the source.
 - `projects/` — project thumbnails (see below).
 

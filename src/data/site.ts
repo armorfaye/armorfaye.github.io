@@ -15,7 +15,7 @@ export const site = {
   email: 'jerryl07@stanford.edu',
   // Resume lives in public/docs. To update it, replace the file and keep the path.
   resume: '/docs/Jerry_Liu_Resume.pdf',
-  profile: '/images/profile-light.jpg',
+  profile: '/images/profile-photo.jpg',
   location: 'Stanford, CA',
 } as const;
 
