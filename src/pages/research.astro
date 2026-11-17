@@ -5,9 +5,11 @@ import ExperienceItem from '../components/ExperienceItem.astro';
 import { publications, posters, areaLabel } from '../data/publications';
 import { experienceSections } from '../data/experience';
 
+// Current research positions (education is not research).
 const current = experienceSections
+  .filter((s) => s.id !== 'education')
   .flatMap((s) => s.entries)
-  .filter((e) => e.current && e.links && e.links.length > 0);
+  .filter((e) => e.current);
 
 const sorted = [...publications].sort((a, b) => b.year - a.year);
 

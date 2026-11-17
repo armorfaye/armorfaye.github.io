@@ -1,5 +1,5 @@
 // Experience timeline data. `highlight` entries appear on the home page;
-// `current` entries with links appear under Ongoing on /research.
+// `current` entries outside Education appear under Ongoing on /research.
 // Entries marked `highlight` also appear in the home-page timeline.
 
 export interface ExperienceEntry {
@@ -40,9 +40,6 @@ export const experienceSections: ExperienceSection[] = [
           'Developing a guidance-based pipeline for data creation and RL environment generation.',
           'Contributing to the next generation of the Marin pretraining architecture (~600B parameters).',
         ],
-        links: [
-          { label: 'Marin', url: 'https://marin.community' },
-        ],
       },
       {
         org: 'Hazy Research · Stanford',
@@ -54,10 +51,6 @@ export const experienceSections: ExperienceSection[] = [
         tags: ['Inference', 'Speculative decoding', 'NCM'],
         bullets: [
           'Working with Hermann Kumbong on speculative decoding for Next-Concept Modeling (NCM), Hazy Research’s coarse-to-fine, parallel text-generation framework.',
-        ],
-        links: [
-          { label: 'NCM blog', url: 'https://hazyresearch.stanford.edu/blog/2026-10-12-ncm' },
-          { label: 'NCM paper', url: 'https://arxiv.org/abs/2610.14162' },
         ],
       },
       {

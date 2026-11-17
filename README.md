@@ -91,8 +91,8 @@ Everything you'll edit regularly lives in `src/data/` and `src/content/`.
   authors, venue, year, links), plus the posters list. Your own name is
   highlighted automatically in author lists (`selfNames`).
 - `src/data/experience.ts` — timeline entries and the `awards` list. Set
-  `highlight: true` to show an entry on the home page; `current: true` entries with
-  links appear under Ongoing on `/research`. There is no separate experience page:
+  `highlight: true` to show an entry on the home page; `current: true` entries (outside
+  Education) appear under Ongoing on `/research`. There is no separate experience page:
   `/experience` redirects to the CV.
 - `src/data/site.ts` — name, tagline, email, social links, resume path, nav, and SEO defaults.
 
