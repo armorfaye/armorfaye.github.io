@@ -1,99 +1,24 @@
 ---
 import { navLinks, site } from '../data/site';
-import Icon from './Icon.astro';
 
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
-const isActive = (href: string) =>
-  href === '/' ? path === '/' : path === href || path.startsWith(href + '/');
+const isActive = (href: string) => path === href || path.startsWith(href + '/');
 ---
 
-<header id="site-header" class="sticky top-0 z-50 border-b border-transparent transition-colors duration-200">
-  <nav class="container-x flex h-16 items-center justify-between" aria-label="Main">
-    <a href="/" class="text-[1.05rem] font-semibold tracking-tight text-ink transition-colors hover:text-accent-300">
-      {site.shortName}
-    </a>
-
-    <div class="flex items-center gap-2">
-      <ul class="hidden items-center gap-7 md:flex">
-        {
-          navLinks.map((link) => (
-            <li>
-              <a
-                href={link.href}
-                aria-current={isActive(link.href) ? 'page' : undefined}
-                class:list={[
-                  'text-[0.92rem] transition-colors',
-                  isActive(link.href) ? 'text-ink' : 'text-muted hover:text-ink',
-                ]}
-              >
-                {link.label}
-              </a>
-            </li>
-          ))
-        }
-        <li>
-          <a href={site.resume} class="text-[0.92rem] text-accent-400 transition-colors hover:text-accent-300">
-            Resume
-          </a>
-        </li>
-      </ul>
-
-      <button
-        id="menu-button"
-        type="button"
-        class="-mr-2 inline-flex h-10 w-10 items-center justify-center rounded-lg text-ink-soft hover:text-ink md:hidden"
-        aria-label="Open menu"
-        aria-expanded="false"
-        aria-controls="mobile-menu"
-      >
-        <span id="menu-open-icon"><Icon name="menu" class="h-5 w-5" /></span>
-        <span id="menu-close-icon" class="hidden"><Icon name="close" class="h-5 w-5" /></span>
-      </button>
-    </div>
-  </nav>
-
-  <div id="mobile-menu" class="hidden border-t border-line bg-bg md:hidden">
-    <ul class="container-x py-3">
+<header class="mono flex items-baseline justify-between gap-4 border-b border-line py-[18px]">
+  <a href="/" class="tlink" data-scramble>{site.shortName}</a>
+  <nav aria-label="Main">
+    <ul class="flex gap-4 sm:gap-[22px]">
       {
         navLinks.map((link) => (
           <li>
-            <a
-              href={link.href}
-              aria-current={isActive(link.href) ? 'page' : undefined}
-              class:list={['block py-3 text-lg', isActive(link.href) ? 'text-ink' : 'text-muted']}
-            >
+            <a href={link.href} class="tlink" aria-current={isActive(link.href) ? 'page' : undefined} data-scramble>
               {link.label}
             </a>
           </li>
         ))
       }
-      <li>
-        <a href={site.resume} class="block py-3 text-lg text-accent-400">Resume</a>
-      </li>
+      <li><a href={site.resume} class="tlink" data-scramble>CV</a></li>
     </ul>
-  </div>
+  </nav>
 </header>
-
-<script>
-  const header = document.getElementById('site-header');
-  const onScroll = () => {
-    const scrolled = window.scrollY > 8;
-    header?.classList.toggle('!border-line', scrolled);
-    header?.classList.toggle('bg-bg/85', scrolled);
-    header?.classList.toggle('backdrop-blur-md', scrolled);
-  };
-  onScroll();
-  window.addEventListener('scroll', onScroll, { passive: true });
-
-  const button = document.getElementById('menu-button');
-  const menu = document.getElementById('mobile-menu');
-  const openIcon = document.getElementById('menu-open-icon');
-  const closeIcon = document.getElementById('menu-close-icon');
-  button?.addEventListener('click', () => {
-    const isOpen = menu?.classList.toggle('hidden') === false;
-    button.setAttribute('aria-expanded', String(isOpen));
-    button.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
-    openIcon?.classList.toggle('hidden', isOpen);
-    closeIcon?.classList.toggle('hidden', !isOpen);
-  });
-</script>

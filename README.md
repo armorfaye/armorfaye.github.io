@@ -1,18 +1,18 @@
 # Jiayu (Jerry) Liu — Portfolio
 
 A fast, accessible, static personal portfolio built with **Astro**, **TypeScript**,
-and **Tailwind CSS**. It showcases research, publications, projects, experience,
-and writing, and deploys for free to GitHub Pages at
+and **Tailwind CSS**. It showcases research, publications, projects, and experience,
+and deploys for free to GitHub Pages at
 [https://armorfaye.github.io](https://armorfaye.github.io).
 
 ## Features
 
-- Static site (no backend) with a quiet black-and-green, dark-only design (Instrument Sans)
-  and a mobile-friendly layout.
-- Two animated pieces: a morphing topology point cloud behind the portrait (canvas) and a
-  live Senju agent-swarm demo. Both respect `prefers-reduced-motion`.
+- Static site (no backend) with a light, editorial design: warm paper, near-black ink, one green (Space Grotesk for headings and labels, Inter for text)
+- Home-page figure: an ASCII loss landscape with an optimizer descending it (`src/components/LossLandscape.astro`)
+  and a live Senju agent-swarm diagram. Both respect `prefers-reduced-motion`.
+- Mobile-friendly layout.
 - Projects authored as MDX in a typed Astro content collection.
-- Publications, experience, awards, and skills stored in simple TypeScript data files.
+- Publications, experience, and awards stored in simple TypeScript data files.
 - SEO metadata (Open Graph + Twitter cards), a sitemap, and a custom 404 page.
 - One-click deploy via GitHub Actions.
 
@@ -56,7 +56,8 @@ Everything you'll edit regularly lives in `src/data/` and `src/content/`.
    ```yaml
    ---
    title: 'My Project'
-   summary: 'One-sentence summary shown on cards.'
+   summary: 'A longer summary used for SEO and as a fallback description.'
+   tagline: 'One short line shown in project lists.'
    abstract: 'A short paragraph shown at the top of the detail page.'
    categories: ['ai-ml'] # ai-ml | assistive-tech | math-theory | software-systems
    award: 'Winner · Some Hackathon' # optional badge
@@ -84,15 +85,16 @@ Everything you'll edit regularly lives in `src/data/` and `src/content/`.
 
 3. The home-page "Featured projects" grid shows projects with `featured: true`.
 
-### Edit publications, experience, skills, and contact info
+### Edit publications, experience, and contact info
 
 - `src/data/publications.ts` — papers on `/research` and the home page (title,
   authors, venue, year, links), plus the posters list. Your own name is
   highlighted automatically in author lists (`selfNames`).
 - `src/data/experience.ts` — timeline entries and the `awards` list. Set
-  `highlight: true` to show an entry on the home page, and `current: true` for the
-  live "now" indicator.
-- `src/data/site.ts` — name, tagline, intro, email, social links, resume path, nav, the affiliations marquee, and SEO defaults.
+  `highlight: true` to show an entry on the home page; `current: true` entries with
+  links appear under Ongoing on `/research`. There is no separate experience page:
+  `/experience` redirects to the CV.
+- `src/data/site.ts` — name, tagline, email, social links, resume path, nav, and SEO defaults.
 
 ### Images and PDFs
 
@@ -100,9 +102,9 @@ Everything you'll edit regularly lives in `src/data/` and `src/content/`.
   `public/docs/README.md`.
 - Put images in `public/images/` (project thumbnails in
   `public/images/projects/`). See `public/images/README.md`.
-- `public/images/profile-dark.jpg` is the portrait used in the home hero
-  (the original studio photo, `profile.png`, with the white background replaced by a dark one).
-- The social-share image is `public/images/og-default.png` (1200×630).
+- `public/images/profile-light.jpg` is the portrait used in the home intro
+  (the original studio photo, `profile.png`, with its white background matched to the page color).
+- The social-share image is `public/images/og-default.png` (1200×630), a screenshot of the home page.
 
 > Keep private or sensitive documents out of `public/` — everything there is
 > published with the site.
@@ -148,10 +150,10 @@ publishes the site on every push to `main`.
 │   ├── images/                    # thumbnails, profile photo, OG image
 │   └── favicon.svg
 └── src/
-    ├── components/                # Navbar, Footer, Hero, TopologyCanvas, SenjuShowcase, list items
+    ├── components/                # Navbar, Footer, LossLandscape, SenjuShowcase, PublicationItem, ExperienceItem, AwardList, Theorem
     ├── content/projects/          # project pages (MDX)
     ├── content.config.ts          # collection schemas
-    ├── data/                      # site, publications, experience, skills
+    ├── data/                      # site, publications, experience
     ├── layouts/                   # BaseLayout, ProjectLayout
     ├── pages/                     # routes
     └── styles/global.css          # Tailwind + design tokens

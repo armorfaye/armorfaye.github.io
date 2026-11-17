@@ -4,16 +4,16 @@ Static images served at `/images/...`.
 
 ## What's here
 
-- `og-default.png` — default social-share (Open Graph) image, 1200×630.
-  `og-default.svg` is its editable source; re-export to PNG after editing.
-- `profile-dark.jpg` — portrait used in the home hero.
+- `og-default.png` — default social-share (Open Graph) image, 1200×630: a screenshot
+  of the top of the home page. Re-capture it after changing the hero.
+- `profile-light.jpg` — portrait used in the home intro (background matched to the page).
 - `profile.png` — the original studio photo (white background), kept as the source.
 - `projects/` — project thumbnails (see below).
 
 ## Project thumbnails (`/images/projects/`)
 
 Each project in `src/content/projects/` points to a thumbnail via its
-`thumbnail` frontmatter field. The current files are black-and-green SVG
+`thumbnail` frontmatter field. The current files are light (paper, ink, and green) SVG
 illustrations that match the site theme:
 
 - `senju.svg`
@@ -21,7 +21,6 @@ illustrations that match the site theme:
 - `audio-aware.svg`
 - `tda-alzheimers.svg`
 - `pure-braid-groups.svg`
-- `llm-notes.svg`
 
 ### Replacing a thumbnail
 

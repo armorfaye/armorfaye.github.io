@@ -1,4 +1,5 @@
-// Experience timeline data, grouped into sections that render on /experience.
+// Experience timeline data. `highlight` entries appear on the home page;
+// `current` entries with links appear under Ongoing on /research.
 // Entries marked `highlight` also appear in the home-page timeline.
 
 export interface ExperienceEntry {
@@ -153,7 +154,7 @@ export const experienceSections: ExperienceSection[] = [
   },
 ];
 
-// Honors shown as tiles on the home page and in a list on /experience.
+// Honors listed on the home page.
 export interface Award {
   title: string;
   detail: string;

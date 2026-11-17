@@ -1,10 +1,9 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import SectionHeader from '../components/SectionHeader.astro';
 import PublicationItem from '../components/PublicationItem.astro';
+import ExperienceItem from '../components/ExperienceItem.astro';
 import { publications, posters, areaLabel } from '../data/publications';
 import { experienceSections } from '../data/experience';
-import { site } from '../data/site';
 
 const current = experienceSections
   .flatMap((s) => s.entries)
@@ -22,90 +21,64 @@ const filters = [
   title="Research"
   description="Publications and ongoing research of Jiayu (Jerry) Liu: configuration spaces with Charles Fefferman, hyperplane arrangements, fall detection, topological data analysis, and LLM research at Stanford."
 >
-  <div class="container-x pt-14">
-    <SectionHeader
-      as="h1"
-      title="Research"
-      subtitle="I work across pure mathematics (topology, analysis, Coxeter groups) and machine learning (LLMs, pose, multimodal, topological ML). Every paper below links to the full text."
-    />
+  <h1 class="page-title" data-scramble-load>Research</h1>
+  <div class="page-intro">
+    <p class="mono dim rv">{publications.length} papers · {posters.length} posters</p>
+    <p class="lead rv" style="--d: 80ms">
+      I work across pure mathematics (topology, analysis, Coxeter groups) and machine learning
+      (LLMs, pose, multimodal models, topological ML).
+    </p>
+  </div>
 
-    <div class="reveal flex flex-wrap gap-3">
-      <a href={site.resume} class="btn-primary">CV</a>
+  <section class="sec">
+    <h2 class="sec-label mono"><span class="idx">01</span><span data-scramble>Ongoing</span></h2>
+    <div class="sec-body">
+      <ul class="table">
+        {current.map((e) => <ExperienceItem entry={e} />)}
+      </ul>
     </div>
+  </section>
 
-    <!-- Ongoing -->
-    <section class="mt-20">
-      <h2 class="reveal text-xl font-semibold text-ink">Ongoing</h2>
-      <div class="mt-6 grid gap-x-10 gap-y-10 md:grid-cols-2">
+  <section class="sec">
+    <h2 class="sec-label mono"><span class="idx">02</span><span data-scramble>Publications</span></h2>
+    <div class="sec-body">
+      <div class="mono mb-6 flex gap-5" role="group" aria-label="Filter by area">
         {
-          current.map((e, i) => (
-            <div class="reveal border-t border-line-strong pt-5" style={`--delay: ${i * 80}ms`}>
-              <p class="text-sm text-faint">{e.org}</p>
-              <h3 class="mt-2 text-lg font-semibold text-ink">{e.role}</h3>
-              <ul class="mt-2 space-y-1.5 text-[0.97rem] leading-relaxed text-muted">
-                {e.bullets.map((b) => <li>{b}</li>)}
-              </ul>
-              <p class="mt-4 flex flex-wrap gap-x-4 text-sm">
-                {e.links!.map((l) => (
-                  <a href={l.url} target="_blank" rel="noopener noreferrer" class="text-accent-400 transition-colors hover:text-accent-300">
-                    {l.label} ↗
-                  </a>
-                ))}
-              </p>
-            </div>
+          filters.map((f, i) => (
+            <button
+              type="button"
+              data-filter={f.id}
+              aria-pressed={i === 0 ? 'true' : 'false'}
+              class="pub-filter cursor-pointer uppercase text-muted transition-colors hover:text-ink aria-pressed:text-accent-600"
+            >
+              [{f.label}]
+            </button>
           ))
         }
       </div>
-    </section>
+      <ul class="pubs">
+        {sorted.map((pub) => <PublicationItem pub={pub} />)}
+      </ul>
+    </div>
+  </section>
 
-    <!-- Publications -->
-    <section class="mt-24">
-      <div class="reveal mb-4 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <h2 class="text-xl font-semibold text-ink">Publications</h2>
-        <div class="flex gap-5 text-[0.92rem]" role="group" aria-label="Filter by area">
-          {
-            filters.map((f, i) => (
-              <button
-                type="button"
-                data-filter={f.id}
-                aria-pressed={i === 0 ? 'true' : 'false'}
-                class="pub-filter text-muted underline-offset-[6px] transition-colors hover:text-ink aria-pressed:text-ink aria-pressed:underline aria-pressed:decoration-accent-400"
-              >
-                {f.label}
-              </button>
-            ))
-          }
-        </div>
-      </div>
-
-      <div class="reveal border-b border-line">
-        {
-          sorted.map((pub) => (
-            <div class="pub" data-area={pub.area}>
-              <PublicationItem pub={pub} />
-            </div>
-          ))
-        }
-      </div>
-    </section>
-
-    <!-- Posters -->
-    <section class="mt-24">
-      <h2 class="reveal text-xl font-semibold text-ink">Posters & documents</h2>
-      <ul class="reveal mt-4 border-b border-line">
+  <section class="sec">
+    <h2 class="sec-label mono"><span class="idx">03</span><span data-scramble>Posters</span></h2>
+    <div class="sec-body">
+      <ul class="table">
         {
           posters.map((p) => (
-            <li class="border-t border-line">
-              <a href={p.url} class="group flex flex-col gap-1 py-5 sm:flex-row sm:items-baseline sm:justify-between">
-                <span class="font-medium text-ink transition-colors group-hover:text-accent-300">{p.title}</span>
-                <span class="text-sm text-faint">{p.venue} · PDF</span>
+            <li class="rv">
+              <span class="mono dim">{p.venue}</span>
+              <a href={p.url} class="t-main tlink col-span-2">
+                {p.title} <span class="arr">↗</span>
               </a>
             </li>
           ))
         }
       </ul>
-    </section>
-  </div>
+    </div>
+  </section>
 
   <script>
     const buttons = document.querySelectorAll<HTMLButtonElement>('.pub-filter');
@@ -119,3 +92,9 @@ const filters = [
     );
   </script>
 </BaseLayout>
+
+<style>
+  .pubs :global(.pub:first-child) {
+    padding-top: 0;
+  }
+</style>

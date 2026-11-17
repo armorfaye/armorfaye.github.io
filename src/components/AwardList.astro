@@ -1,0 +1,19 @@
+---
+import { awards } from '../data/experience';
+---
+
+<ul class="table">
+  {
+    awards.map((a) => (
+      <li class="rv">
+        <span class="mono dim">{a.year ?? '—'}</span>
+        {a.link ? (
+          <a href={a.link} class="t-main tlink">{a.title}</a>
+        ) : (
+          <span class="t-main">{a.title}</span>
+        )}
+        <span class="t-sub">{a.detail}</span>
+      </li>
+    ))
+  }
+</ul>

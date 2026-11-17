@@ -10,9 +10,10 @@ export default defineConfig({
   site: 'https://armorfaye.github.io',
   base: '/',
   integrations: [mdx(), sitemap()],
-  // Old URL for the papers page.
+  // Old URLs: the papers page, and the experience page (now covered by the CV).
   redirects: {
     '/writing': '/research',
+    '/experience': '/docs/Jerry_Liu_Resume.pdf',
   },
   vite: {
     plugins: [tailwindcss()],

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
-  <rect width="64" height="64" rx="14" fill="#060908"/>
-  <rect x="1.5" y="1.5" width="61" height="61" rx="12.5" fill="none" stroke="#3ef08a" stroke-opacity="0.55" stroke-width="2"/>
+  <rect width="64" height="64" fill="#111210"/>
   <text x="50%" y="50%" dy="0.04em" text-anchor="middle" dominant-baseline="central"
-    font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="26" font-weight="700" fill="#3ef08a">JL</text>
+    font-family="'Helvetica Neue', Arial, sans-serif" font-size="30" font-weight="600" letter-spacing="-1.5" fill="#ecebe5">JL</text>
+  <rect x="44" y="48" width="8" height="4" fill="#0a8a4a"/>
 </svg>

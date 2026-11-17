@@ -3,52 +3,35 @@ import type { ExperienceEntry } from '../data/experience';
 
 interface Props {
   entry: ExperienceEntry;
-  delay?: number;
-  showBullets?: boolean;
 }
-const { entry, delay = 0, showBullets = true } = Astro.props;
+const { entry } = Astro.props;
+const links = entry.links ?? [];
 ---
 
-<li class="reveal grid gap-1 border-t border-line py-6 sm:grid-cols-[10rem_1fr] sm:gap-6" style={`--delay: ${delay}ms`}>
-  <p class="text-sm tabular-nums text-faint sm:pt-0.5">{entry.dates}</p>
-
-  <div class="min-w-0">
-    <h3 class="text-[1.05rem] font-semibold text-ink">
-      {entry.org}
-    </h3>
-    <p class="mt-0.5 text-[0.97rem] text-muted">
-      {entry.role}{entry.location && <span class="text-faint"> · {entry.location}</span>}
-    </p>
-
-    {
-      showBullets && entry.bullets.length > 0 && (
-        <ul class="mt-3 space-y-1.5 text-[0.97rem] leading-relaxed text-ink-soft">
-          {entry.bullets.map((b) => (
-            <li>{b}</li>
-          ))}
-        </ul>
-      )
-    }
-
-    {
-      showBullets && entry.links && entry.links.length > 0 && (
-        <p class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm">
-          {entry.links.map((l) => {
-            const external = l.url.startsWith('http');
-            return (
-              <a
-                href={l.url}
-                target={external ? '_blank' : undefined}
-                rel={external ? 'noopener noreferrer' : undefined}
-                class="text-accent-400 transition-colors hover:text-accent-300"
-              >
+<li class="rv">
+  <span class="mono dim">{entry.dates}</span>
+  <span class="t-main">{entry.org}</span>
+  <span class="t-sub">{entry.role}</span>
+  {
+    (entry.bullets.length > 0 || links.length > 0) && (
+      <div class="t-more">
+        {entry.bullets.length > 0 && (
+          <ul class="dash-list">
+            {entry.bullets.map((b) => (
+              <li>{b}</li>
+            ))}
+          </ul>
+        )}
+        {links.length > 0 && (
+          <p class="mono link-row">
+            {links.map((l) => (
+              <a href={l.url} class="tag-link" {...(l.url.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
                 {l.label}
-                {external ? ' ↗' : ' →'}
               </a>
-            );
-          })}
-        </p>
-      )
-    }
-  </div>
+            ))}
+          </p>
+        )}
+      </div>
+    )
+  }
 </li>

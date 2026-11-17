@@ -9,6 +9,8 @@ const projects = defineCollection({
   schema: z.object({
     title: text(),
     summary: text(),
+    // One short line for list rows.
+    tagline: text().optional(),
     abstract: text(),
     categories: z.array(
       z.enum(['ai-ml', 'assistive-tech', 'math-theory', 'software-systems']),

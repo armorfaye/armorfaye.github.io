@@ -3,68 +3,72 @@ import { selfNames, type Publication } from '../data/publications';
 
 interface Props {
   pub: Publication;
+  // Compact rows (home page) skip the blurb and use the short venue.
   compact?: boolean;
 }
 const { pub, compact = false } = Astro.props;
+const primary = pub.project ? `/projects/${pub.project}` : pub.links[0]?.url;
+const external = primary?.startsWith('http');
 ---
 
-<article class="grid gap-1 border-t border-line py-7 sm:grid-cols-[4.5rem_1fr] sm:gap-6" data-area={pub.area}>
-  <p class="text-sm tabular-nums text-faint sm:pt-1">{pub.year}</p>
+<li class="pub rv" data-area={pub.area}>
+  <a
+    href={primary}
+    target={external ? '_blank' : undefined}
+    rel={external ? 'noopener noreferrer' : undefined}
+    class="pub-title"
+  >
+    {pub.title}
+  </a>
+  <p class="pub-authors">
+    {
+      pub.authors.map((a, i) => (
+        <>
+          <span class:list={[selfNames.includes(a) && 'me']}>{a}</span>
+          {i < pub.authors.length - 1 && ', '}
+        </>
+      ))
+    }
+  </p>
+  {!compact && <p class="pub-blurb">{pub.blurb}</p>}
+  <p class="mono link-row">
+    <span class="dim">{compact ? pub.venueShort : pub.venue} · {pub.year}</span>
+    {
+      pub.links.map((l) => (
+        <a href={l.url} class="tag-link" {...(l.url.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
+          {l.label}
+        </a>
+      ))
+    }
+  </p>
+</li>
 
-  <div class="min-w-0">
-    <h3 class="text-lg font-semibold leading-snug text-ink">
-      {
-        pub.project ? (
-          <a href={`/projects/${pub.project}`} class="transition-colors hover:text-accent-300">
-            {pub.title}
-          </a>
-        ) : (
-          <a href={pub.links[0]?.url} target="_blank" rel="noopener noreferrer" class="transition-colors hover:text-accent-300">
-            {pub.title}
-          </a>
-        )
-      }
-    </h3>
-
-    <p class="mt-1.5 text-[0.95rem] text-muted">
-      {
-        pub.authors.map((a, i) => (
-          <>
-            <span class:list={[selfNames.includes(a) && 'font-medium text-ink']}>{a}</span>
-            {i < pub.authors.length - 1 && ', '}
-          </>
-        ))
-      }
-    </p>
-    <p class="mt-0.5 text-[0.95rem] italic text-faint">
-      {pub.venue}{pub.highlight && <span class="not-italic text-accent-400"> · {pub.highlight}</span>}
-    </p>
-
-    {!compact && <p class="mt-3 max-w-2xl text-[0.97rem] leading-relaxed text-ink-soft">{pub.blurb}</p>}
-
-    <p class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm">
-      {
-        pub.links.map((l) => {
-          const external = l.url.startsWith('http');
-          return (
-            <a
-              href={l.url}
-              target={external ? '_blank' : undefined}
-              rel={external ? 'noopener noreferrer' : undefined}
-              class="text-accent-400 transition-colors hover:text-accent-300"
-            >
-              {l.label}
-            </a>
-          );
-        })
-      }
-      {
-        pub.project && (
-          <a href={`/projects/${pub.project}`} class="text-muted transition-colors hover:text-ink">
-            Project →
-          </a>
-        )
-      }
-    </p>
-  </div>
-</article>
+<style>
+  .pub {
+    padding: 18px 0;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .pub-title {
+    font-size: 19px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    line-height: 1.35;
+    color: var(--color-ink);
+    transition: color 0.2s;
+  }
+  .pub-title:hover {
+    color: var(--accent);
+  }
+  .pub-authors {
+    margin-top: 4px;
+    font-size: 16px;
+    color: var(--color-muted);
+  }
+  .pub-authors .me {
+    color: var(--color-ink);
+  }
+  .pub-blurb {
+    margin-top: 8px;
+    max-width: 70ch;
+  }
+</style>

@@ -26,7 +26,7 @@ const ogImage = new URL(image, site.url).href;
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#070a09" />
+    <meta name="theme-color" content="#ecebe5" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
 
@@ -52,47 +52,99 @@ const ogImage = new URL(image, site.url).href;
       document.documentElement.classList.remove('no-js');
     </script>
   </head>
-  <body class="flex min-h-screen flex-col overflow-x-clip">
-    <div class="backdrop" aria-hidden="true"></div>
-
+  <body>
     <a
       href="#main"
-      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-md focus:bg-accent-400 focus:px-4 focus:py-2 focus:text-void"
+      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:bg-ink focus:px-4 focus:py-2 focus:text-bg"
     >
       Skip to content
     </a>
+    <img class="hover-img" alt="" aria-hidden="true" />
 
-    <Navbar />
-
-    <main id="main" class="flex-1 overflow-x-clip">
-      <slot />
-    </main>
-
-    <Footer />
+    <div class="wrap">
+      <Navbar />
+      <main id="main">
+        <slot />
+      </main>
+      <Footer />
+    </div>
 
     <script>
-      // Reveal-on-scroll for any element with .reveal.
-      const reveal = () => {
-        const els = document.querySelectorAll<HTMLElement>('.reveal:not(.is-visible)');
-        if (!('IntersectionObserver' in window)) {
-          els.forEach((el) => el.classList.add('is-visible'));
-          return;
-        }
-        const io = new IntersectionObserver(
-          (entries) => {
-            for (const entry of entries) {
-              if (entry.isIntersecting) {
-                entry.target.classList.add('is-visible');
-                io.unobserve(entry.target);
-              }
-            }
-          },
-          { rootMargin: '0px 0px -8% 0px', threshold: 0.08 },
-        );
-        els.forEach((el) => io.observe(el));
-      };
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      reveal();
+      // Reveal on scroll; section rules draw in.
+      const io = new IntersectionObserver(
+        (entries) =>
+          entries.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add('in');
+              io.unobserve(e.target);
+            }
+          }),
+        { rootMargin: '0px 0px -6% 0px' },
+      );
+      document.querySelectorAll('.rv, .sec').forEach((el) => io.observe(el));
+
+      // Text scramble: once on load for [data-scramble-load], on hover for [data-scramble].
+      const GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&*+=/<>';
+      const busy = new WeakSet<HTMLElement>();
+      const scramble = (el: HTMLElement, speed = 1) => {
+        if (reduce || busy.has(el)) return;
+        const final = (el.dataset.text ??= el.textContent ?? '');
+        busy.add(el);
+        const at = [...final].map((_, i) => (i * 1.6 + Math.random() * 6) / speed);
+        let f = 0;
+        const step = () => {
+          let out = '';
+          let done = true;
+          for (let i = 0; i < final.length; i++) {
+            const c = final[i];
+            if (c === ' ' || f >= at[i]) out += c;
+            else {
+              done = false;
+              out += GLYPHS[(Math.random() * GLYPHS.length) | 0];
+            }
+          }
+          el.textContent = out;
+          f++;
+          if (done) busy.delete(el);
+          else requestAnimationFrame(step);
+        };
+        step();
+      };
+      document.querySelectorAll<HTMLElement>('[data-scramble-load]').forEach((el) => scramble(el, 0.35));
+      document.querySelectorAll<HTMLElement>('[data-scramble]').forEach((el) =>
+        el.addEventListener('pointerenter', () => scramble(el, 1.4)),
+      );
+
+      // Thumbnail that follows the pointer over [data-img] rows.
+      const img = document.querySelector<HTMLImageElement>('.hover-img');
+      if (img && window.matchMedia('(hover: hover)').matches) {
+        let x = 0, y = 0, cx = 0, cy = 0, raf = 0;
+        const follow = () => {
+          cx += (x - cx) * 0.18;
+          cy += (y - cy) * 0.18;
+          img.style.transform = `translate(${cx + 28}px, ${cy - 90}px)`;
+          raf = img.classList.contains('on') || Math.abs(x - cx) > 0.5 ? requestAnimationFrame(follow) : 0;
+        };
+        window.addEventListener('pointermove', (e) => {
+          x = e.clientX;
+          y = e.clientY;
+          if (!raf && img.classList.contains('on')) raf = requestAnimationFrame(follow);
+        });
+        document.querySelectorAll<HTMLElement>('[data-img]').forEach((row) => {
+          row.addEventListener('pointerenter', (e) => {
+            img.src = row.dataset.img!;
+            if (!img.classList.contains('on')) {
+              cx = x = e.clientX;
+              cy = y = e.clientY;
+            }
+            img.classList.add('on');
+            if (!raf) raf = requestAnimationFrame(follow);
+          });
+          row.addEventListener('pointerleave', () => img.classList.remove('on'));
+        });
+      }
     </script>
   </body>
 </html>

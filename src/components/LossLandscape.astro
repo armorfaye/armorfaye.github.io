@@ -1,0 +1,465 @@
+---
+// A non-convex loss landscape rendered as ASCII characters on a <canvas>,
+// with an optimizer (SGD with momentum, Adam, or Muon) descending it in the accent color.
+// The surface turns slowly and tilts toward the pointer. When a run settles,
+// the terrain morphs into a new one and a new run starts. Clicking the surface
+// drops a ball at that point.
+//
+// Colors come from CSS: `color` for the terrain, `--fig-accent` for the path.
+// An element with [data-fig-caption] inside the same [data-fig-root] receives
+// a live caption (step and loss). A [data-fig-opt] button there cycles the
+// optimizer: the run replays from the same start, and the previous run's path
+// stays as faint dots for comparison.
+interface Props {
+  class?: string;
+  // Character size in px (smaller = finer detail).
+  cell?: number;
+}
+const { class: className, cell = 11 } = Astro.props;
+---
+
+<canvas class:list={['loss-landscape', className]} data-cell={cell} aria-hidden="true"></canvas>
+
+<style>
+  .loss-landscape {
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: crosshair;
+    touch-action: pan-y;
+  }
+</style>
+
+<script>
+  const GX = 230; // grid resolution along x
+  const GY = 130; // grid resolution along y
+  const SX = 5.2; // domain is [-SX, SX] × [-SY, SY]
+  const SY = 2.9;
+  const RIDGE = 13; // draw every RIDGE-th slice along y
+  const HEIGHT = 4.8; // vertical exaggeration
+  const MORPH = 1600;
+  const SETTLE = 1200;
+
+  type Well = { x: number; y: number; a: number; s: number };
+  type Land = { wells: Well[]; rip: number[]; min: number; max: number; h: Float32Array };
+
+  const rng = (seed: number) => () => {
+    seed |= 0;
+    seed = (seed + 0x6d2b79f5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+
+  const gx = (i: number) => -SX + (2 * SX * i) / (GX - 1);
+  const gy = (j: number) => -SY + (2 * SY * j) / (GY - 1);
+
+  const raw = (L: Pick<Land, 'wells' | 'rip'>, x: number, y: number) => {
+    let v = 0.05 * x * x + 0.11 * y * y;
+    for (const w of L.wells) {
+      const dx = x - w.x, dy = y - w.y;
+      v -= w.a * Math.exp(-(dx * dx + dy * dy) / (2 * w.s * w.s));
+    }
+    const [fx, fy, px, py, amp] = L.rip;
+    return v + amp * Math.sin(fx * x + px) * Math.cos(fy * y + py);
+  };
+
+  const makeLand = (seed: number): Land => {
+    const r = rng(seed);
+    const wells: Well[] = [];
+    const n = 5 + Math.floor(r() * 3);
+    for (let i = 0; i < n; i++) {
+      wells.push({
+        x: (r() * 2 - 1) * (SX - 0.9),
+        y: (r() * 2 - 1) * (SY - 0.6),
+        a: 0.35 + r() * 0.7,
+        s: 0.4 + r() * 0.5,
+      });
+    }
+    wells[0].a = 1.3; // one clear global minimum
+    const rip = [1.4 + r() * 1.2, 1.6 + r() * 1.4, r() * 6, r() * 6, 0.06 + r() * 0.05];
+    const h = new Float32Array(GX * GY);
+    let min = Infinity, max = -Infinity;
+    for (let j = 0; j < GY; j++) {
+      for (let i = 0; i < GX; i++) {
+        const v = raw({ wells, rip }, gx(i), gy(j));
+        h[j * GX + i] = v;
+        if (v < min) min = v;
+        if (v > max) max = v;
+      }
+    }
+    for (let k = 0; k < h.length; k++) h[k] = (h[k] - min) / (max - min);
+    return { wells, rip, min, max, h };
+  };
+
+  const ease = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+
+  function mount(canvas: HTMLCanvasElement) {
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    const root = canvas.closest('[data-fig-root]') ?? canvas.parentElement!;
+    const caption = root.querySelector<HTMLElement>('[data-fig-caption]');
+    const baseCell = Number(canvas.dataset.cell) || 11;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    let seed = 11;
+    let A = makeLand(seed);
+    let B = A;
+    let mix = 0; // 0 → A, 1 → B (only during a morph)
+
+    const height = (x: number, y: number) => {
+      const a = (raw(A, x, y) - A.min) / (A.max - A.min);
+      if (mix === 0) return a;
+      const b = (raw(B, x, y) - B.min) / (B.max - B.min);
+      return a + (b - a) * mix;
+    };
+    const gridH = (k: number) => (mix === 0 ? A.h[k] : A.h[k] + (B.h[k] - A.h[k]) * mix);
+
+    // Optimizer state.
+    // m: momentum / first moment; v: Adam's second moment; vx, vy: last displacement.
+    const OPTS = ['sgd + momentum', 'adam', 'muon'] as const;
+    let opt = 0;
+    const optBtn = root.querySelector<HTMLButtonElement>('[data-fig-opt]');
+    const ball = { x: 0, y: 0, vx: 0, vy: 0, mx: 0, my: 0, sx: 0, sy: 0, step: 0, still: 0 };
+    const trail: number[] = [];
+    let ghost: number[] = []; // previous optimizer's path from the same start
+    let phase: 'run' | 'settle' | 'morph' = 'run';
+    let phaseT = 0;
+
+    const drop = (x: number, y: number) => {
+      Object.assign(ball, { x, y, vx: 0, vy: 0, mx: 0, my: 0, sx: 0, sy: 0, step: 0, still: 0 });
+      trail.length = 0;
+      trail.push(x, y);
+      phase = 'run';
+      phaseT = 0;
+    };
+    const dropAtPeak = () => {
+      let best = -1, bx = 0, by = 0;
+      for (let k = 0; k < 30; k++) {
+        const x = (Math.random() * 2 - 1) * (SX - 0.5);
+        const y = (Math.random() * 2 - 1) * (SY - 0.4);
+        const h = height(x, y);
+        if (h > best) { best = h; bx = x; by = y; }
+      }
+      drop(bx, by);
+    };
+
+    const stepBall = () => {
+      const e = 1e-3;
+      const gX = (height(ball.x + e, ball.y) - height(ball.x - e, ball.y)) / (2 * e);
+      const gY = (height(ball.x, ball.y + e) - height(ball.x, ball.y - e)) / (2 * e);
+      // Small gradient noise stands in for minibatch noise.
+      const nX = gX + (Math.random() - 0.5) * 0.04, nY = gY + (Math.random() - 0.5) * 0.04;
+      const t = ball.step + 1;
+      const decay = 1 - 0.9 * Math.min(1, t / 700); // linear lr decay
+      let dx: number, dy: number;
+      if (opt === 0) {
+        // SGD with heavy-ball momentum.
+        ball.mx = 0.93 * ball.mx - 0.0065 * nX;
+        ball.my = 0.93 * ball.my - 0.0065 * nY;
+        dx = ball.mx; dy = ball.my;
+      } else if (opt === 1) {
+        // Adam with bias correction: per-coordinate step size.
+        const b1 = 0.9, b2 = 0.999;
+        ball.mx = b1 * ball.mx + (1 - b1) * nX;
+        ball.my = b1 * ball.my + (1 - b1) * nY;
+        ball.sx = b2 * ball.sx + (1 - b2) * nX * nX;
+        ball.sy = b2 * ball.sy + (1 - b2) * nY * nY;
+        const c1 = 1 - b1 ** t, c2 = 1 - b2 ** t, lr = 0.022 * decay;
+        dx = (-lr * (ball.mx / c1)) / (Math.sqrt(ball.sx / c2) + 1e-8);
+        dy = (-lr * (ball.my / c1)) / (Math.sqrt(ball.sy / c2) + 1e-8);
+      } else {
+        // Muon: momentum, then orthogonalize. For a 1×2 parameter the
+        // orthogonalized update is the unit vector along the momentum.
+        ball.mx = 0.95 * ball.mx + nX;
+        ball.my = 0.95 * ball.my + nY;
+        const ux = nX + 0.95 * ball.mx, uy = nY + 0.95 * ball.my; // Nesterov
+        const k = (0.03 * decay) / (Math.hypot(ux, uy) + 1e-8);
+        dx = -k * ux; dy = -k * uy;
+      }
+      ball.x += dx;
+      ball.y += dy;
+      ball.vx = dx;
+      ball.vy = dy;
+      if (Math.abs(ball.x) > SX - 0.05) { ball.x = Math.sign(ball.x) * (SX - 0.05); ball.mx *= opt === 0 ? -0.5 : 0; }
+      if (Math.abs(ball.y) > SY - 0.05) { ball.y = Math.sign(ball.y) * (SY - 0.05); ball.my *= opt === 0 ? -0.5 : 0; }
+      ball.step = t;
+      trail.push(ball.x, ball.y);
+      if (trail.length > 2 * 400) trail.splice(0, 2);
+      ball.still = Math.hypot(ball.vx, ball.vy) < 0.0018 ? ball.still + 1 : 0;
+      if (ball.still > 70 || ball.step > 900) {
+        // Give a just-switched optimizer time to finish next to its ghost.
+        if (ghost.length && phase === 'run') { phase = 'settle'; phaseT = -SETTLE; return; }
+        phase = 'settle';
+        phaseT = 0;
+      }
+    };
+
+    // Canvas geometry.
+    let W = 0, H = 0, cols = 0, rows = 0, cw = 0, ch = 0;
+    let zbuf = new Float32Array(0), lum = new Float32Array(0);
+    let horizon = new Float32Array(0), next = new Float32Array(0);
+    let drawn = new Uint16Array(0);
+    const P = new Float32Array(GX * GY * 2);
+    let cellX = new Float32Array(0), cellY = new Float32Array(0);
+    let ink = '#333', accent = '#0a8a4a';
+    const pointer = { x: 0.5, y: 0.5 };
+    const tilt = { x: 0, y: 0 };
+
+    const readColors = () => {
+      const cs = getComputedStyle(canvas);
+      ink = cs.color;
+      accent = cs.getPropertyValue('--fig-accent').trim() || accent;
+    };
+
+    const resize = () => {
+      const rect = canvas.getBoundingClientRect();
+      W = rect.width;
+      H = rect.height;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.round(W * dpr);
+      canvas.height = Math.round(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const fs = Math.max(7, Math.min(baseCell, W / 78));
+      cw = fs * 0.62;
+      ch = fs * 1.15;
+      cols = Math.max(1, Math.floor(W / cw));
+      rows = Math.max(1, Math.floor(H / ch));
+      zbuf = new Float32Array(cols * rows);
+      lum = new Float32Array(cols * rows);
+      horizon = new Float32Array(cols);
+      next = new Float32Array(cols);
+      drawn = new Uint16Array(cols * rows);
+      cellX = new Float32Array(cols * rows);
+      cellY = new Float32Array(cols * rows);
+      ctx.font = `500 ${fs}px 'DM Mono', ui-monospace, monospace`;
+      ctx.textBaseline = 'top';
+      readColors();
+    };
+
+    // Camera, recomputed each frame.
+    let cB = 1, sB = 0, cE = 1, sE = 0, Kp = 1, cx0 = 0, cy0 = 0;
+    const FILL = 1.0;
+    const Z0 = 14;
+    const project = (x: number, y: number, h: number) => {
+      const z = (h - 0.5) * HEIGHT;
+      const x1 = x * cB - y * sB;
+      const y1 = x * sB + y * cB;
+      const up = z * cE + y1 * sE;
+      const depth = -y1 * cE + z * sE;
+      const ooz = 1 / (Z0 - depth);
+      return [cx0 + Kp * ooz * x1 * Z0, cy0 - Kp * ooz * up * Z0, ooz];
+    };
+
+    const LX = -0.5, LY = -0.45, LZ = 0.75;
+    const LN = Math.hypot(LX, LY, LZ);
+    const dX = (2 * SX) / (GX - 1), dY = (2 * SY) / (GY - 1);
+
+    const draw = (time: number, dt: number) => {
+      phaseT += dt;
+      if (phase === 'run') {
+        stepBall();
+        stepBall();
+      } else if (phase === 'settle' && phaseT > SETTLE) {
+        seed += 1;
+        B = makeLand(seed);
+        ghost = [];
+        phase = 'morph';
+        phaseT = 0;
+      } else if (phase === 'morph') {
+        mix = ease(Math.min(1, phaseT / MORPH));
+        if (phaseT >= MORPH) {
+          A = B;
+          mix = 0;
+          dropAtPeak();
+        }
+      }
+
+      tilt.x += ((pointer.y - 0.5) * 0.25 - tilt.x) * 0.05;
+      tilt.y += ((pointer.x - 0.5) * 0.7 - tilt.y) * 0.05;
+      const E = 0.6 + tilt.x; // elevation above the horizon
+      const Bz = 0.12 * Math.sin(time * 0.00016) + tilt.y * 0.4; // gentle sway
+      cE = Math.cos(E); sE = Math.sin(E); cB = Math.cos(Bz); sB = Math.sin(Bz);
+      // Project every grid point once (unit scale), then fit the bounds to the canvas.
+      Kp = 1; cx0 = 0; cy0 = 0;
+      let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+      for (let k = 0; k < GX * GY; k++) {
+        const i = k % GX, j = (k / GX) | 0;
+        const [px, py] = project(gx(i), gy(j), gridH(k));
+        P[2 * k] = px;
+        P[2 * k + 1] = py;
+        if (px < x0) x0 = px;
+        if (px > x1) x1 = px;
+        if (py < y0) y0 = py;
+        if (py > y1) y1 = py;
+      }
+      Kp = Math.min((0.98 * W) / (x1 - x0), (0.94 * H) / (y1 - y0));
+      cx0 = W / 2 - (Kp * (x0 + x1)) / 2;
+      cy0 = H / 2 - (Kp * (y0 + y1)) / 2;
+
+      // Floating horizon, near (j = 0) to far: a slice is visible only where it
+      // rises above every nearer slice. Every RIDGE-th slice is drawn.
+      ctx.clearRect(0, 0, W, H);
+      ctx.fillStyle = ink;
+      zbuf.fill(0);
+      horizon.fill(1e9);
+      const GL = ['-', '/', '\\', '|', '_', '\u00af'];
+      for (let j = 0; j < GY; j++) {
+        const ridge = j % RIDGE === 0;
+        next.set(horizon);
+        if (ridge) ctx.globalAlpha = 1 - 0.5 * (j / (GY - 1));
+        let pc = -1, pr = 0;
+        for (let i = 0; i < GX; i++) {
+          const k = j * GX + i;
+          const c = (cx0 + Kp * P[2 * k]) / cw;
+          const r = (cy0 + Kp * P[2 * k + 1]) / ch;
+          const ci = Math.floor(c), ri = Math.floor(r);
+          if (ci >= 0 && ci < cols) {
+            if (ridge && ri < next[ci]) next[ci] = ri;
+            if (ri >= 0 && ri < rows) {
+              const cell = ri * cols + ci;
+              if (zbuf[cell] === 0) {
+                zbuf[cell] = 1;
+                cellX[cell] = gx(i);
+                cellY[cell] = gy(j);
+              }
+            }
+          }
+          if (ridge && pc >= 0) {
+            // Rasterize the segment from the previous point in cell space.
+            const dc = c - pc, dr = r - pr;
+            const slope = -dr / (dc || 1e-6);
+            const g = Math.abs(slope) < 0.45 ? 0 : Math.abs(slope) > 2.2 ? 3 : slope > 0 ? 1 : 2;
+            const steps = Math.max(1, Math.ceil(Math.max(Math.abs(dc), Math.abs(dr))));
+            for (let t = 1; t <= steps; t++) {
+              const fr = pr + (dr * t) / steps;
+              const sc = Math.floor(pc + (dc * t) / steps), sr = Math.floor(fr);
+              if (sc < 0 || sc >= cols || sr < 0 || sr >= rows) continue;
+              if (sr >= horizon[sc]) continue; // hidden behind nearer terrain
+              const cell = sr * cols + sc;
+              if (drawn[cell] === j + 1) continue;
+              drawn[cell] = j + 1;
+              // Flat stretches pick a glyph by where the line falls within the cell.
+              const sub = fr - sr;
+              const gg = g !== 0 ? g : sub < 0.33 ? 5 : sub > 0.72 ? 4 : 0;
+              ctx.fillText(GL[gg], sc * cw, sr * ch);
+            }
+          }
+          pc = c;
+          pr = r;
+        }
+        horizon.set(next);
+      }
+      ctx.globalAlpha = 1;
+      drawn.fill(0);
+
+      // Previous optimizer's path (faint dots), then the current one on top.
+      if (phase !== 'morph' && ghost.length) {
+        ctx.fillStyle = ink;
+        ctx.globalAlpha = 0.9;
+        let lastCell = -1;
+        for (let t = 0; t < ghost.length / 2; t++) {
+          const x = ghost[2 * t], y = ghost[2 * t + 1];
+          const [px, py] = project(x, y, height(x, y) + 0.01);
+          const c = Math.floor(px / cw), r = Math.floor(py / ch);
+          if (c < 0 || c >= cols || r < 0 || r >= rows) continue;
+          const cell = r * cols + c;
+          if (cell === lastCell) continue;
+          lastCell = cell;
+          ctx.clearRect(c * cw - 1, r * ch, cw + 2, ch);
+          ctx.fillText('·', c * cw, r * ch);
+        }
+        ctx.globalAlpha = 1;
+      }
+      if (phase !== 'morph' && trail.length) {
+        ctx.fillStyle = accent;
+        const n = trail.length / 2;
+        let lastCell = -1;
+        const draw1 = (t: number, glyph: string) => {
+          const x = trail[2 * t], y = trail[2 * t + 1];
+          const [px, py] = project(x, y, height(x, y) + 0.01);
+          const c = Math.floor(px / cw), r = Math.floor(py / ch);
+          if (c < 0 || c >= cols || r < 0 || r >= rows) return;
+          const cell = r * cols + c;
+          if (cell === lastCell) return;
+          lastCell = cell;
+          ctx.clearRect(c * cw - 1, r * ch, cw + 2, ch);
+          ctx.fillText(glyph, c * cw, r * ch);
+        };
+        for (let t = 0; t < n - 1; t++) draw1(t, t === 0 ? 'o' : '*');
+        lastCell = -1;
+        draw1(n - 1, '@');
+      }
+
+      if (caption) {
+        caption.textContent =
+          phase === 'morph'
+            ? 'new landscape…'
+            : `${optBtn ? '' : OPTS[opt] + ' · '}step ${String(ball.step).padStart(3, '0')} · loss ${Math.max(0, height(ball.x, ball.y)).toFixed(3).replace('-', '')}`;
+      }
+    };
+
+    let running = false, raf = 0, last = 0, elapsed = 0;
+    const loop = (now: number) => {
+      if (!running) return;
+      const dt = Math.max(0, Math.min(64, now - last));
+      last = now;
+      elapsed += dt;
+      draw(elapsed, dt);
+      raf = requestAnimationFrame(loop);
+    };
+    const start = () => {
+      if (running || reduce) return;
+      running = true;
+      last = performance.now();
+      raf = requestAnimationFrame(loop);
+    };
+    const stop = () => {
+      running = false;
+      cancelAnimationFrame(raf);
+    };
+
+    window.addEventListener('pointermove', (e) => {
+      pointer.x = Math.min(1, Math.max(0, e.clientX / window.innerWidth));
+      pointer.y = Math.min(1, Math.max(0, e.clientY / window.innerHeight));
+    });
+    canvas.addEventListener('pointerdown', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const c = Math.floor((e.clientX - rect.left) / cw), r = Math.floor((e.clientY - rect.top) / ch);
+      if (c < 0 || c >= cols || r < 0 || r >= rows) return;
+      const cell = r * cols + c;
+      if (zbuf[cell] > 0 && phase !== 'morph') {
+        ghost = [];
+        drop(cellX[cell], cellY[cell]);
+      }
+    });
+
+    // Switch optimizer: replay from this run's start, keeping the old path as a ghost.
+    optBtn?.addEventListener('click', () => {
+      opt = (opt + 1) % OPTS.length;
+      optBtn.textContent = OPTS[opt];
+      if (phase === 'morph' || trail.length < 2) return; // applies to the next run
+      ghost = trail.slice();
+      drop(trail[0], trail[1]);
+      if (!running) {
+        for (let k = 0; k < 900 && phase === 'run'; k++) stepBall();
+        draw(elapsed, 0);
+      }
+    });
+
+    new ResizeObserver(() => {
+      resize();
+      if (!running) draw(elapsed, 0);
+    }).observe(canvas);
+    new IntersectionObserver((entries) => (entries[0].isIntersecting ? start() : stop())).observe(canvas);
+
+    resize();
+    dropAtPeak();
+    if (reduce) for (let k = 0; k < 500 && phase === 'run'; k++) stepBall();
+    phase = 'run';
+    draw(0, 0);
+  }
+
+  const init = () => document.querySelectorAll<HTMLCanvasElement>('canvas.loss-landscape').forEach(mount);
+  document.fonts ? document.fonts.ready.then(init) : init();
+</script>

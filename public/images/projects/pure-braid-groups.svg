@@ -1,43 +1,43 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675">
 <defs>
   <radialGradient id="glow" cx="50%" cy="45%" r="65%">
-    <stop offset="0" stop-color="#1fd672" stop-opacity="0.22"/>
-    <stop offset="1" stop-color="#1fd672" stop-opacity="0"/>
+    <stop offset="0" stop-color="#0a8a4a" stop-opacity="0.22"/>
+    <stop offset="1" stop-color="#0a8a4a" stop-opacity="0"/>
   </radialGradient>
   <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-    <path d="M40 0H0V40" fill="none" stroke="#ffffff" stroke-opacity="0.045" stroke-width="1"/>
+    <path d="M40 0H0V40" fill="none" stroke="#000000" stroke-opacity="0.06" stroke-width="1"/>
   </pattern>
   <filter id="blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>
   <linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0.6" stop-color="#050806" stop-opacity="0"/>
-    <stop offset="1" stop-color="#050806" stop-opacity="0.9"/>
+    <stop offset="0.6" stop-color="#ecebe5" stop-opacity="0"/>
+    <stop offset="1" stop-color="#ecebe5" stop-opacity="0.9"/>
   </linearGradient>
 </defs>
-<rect width="1200" height="675" fill="#050806"/>
+<rect width="1200" height="675" fill="#ecebe5"/>
 <rect width="1200" height="675" fill="url(#grid)"/>
-<rect width="1200" height="675" fill="url(#glow)"/>
-<line x1="620.0" y1="320.0" x2="1140.0" y2="320.0" stroke="#3ef08a" stroke-opacity="0.55" stroke-width="2"/>
-<line x1="654.8" y1="190.0" x2="1105.2" y2="450.0" stroke="#3ef08a" stroke-opacity="0.55" stroke-width="2"/>
-<line x1="750.0" y1="94.8" x2="1010.0" y2="545.2" stroke="#3ef08a" stroke-opacity="0.55" stroke-width="2"/>
-<line x1="880.0" y1="60.0" x2="880.0" y2="580.0" stroke="#3ef08a" stroke-opacity="0.55" stroke-width="2"/>
-<line x1="1010.0" y1="94.8" x2="750.0" y2="545.2" stroke="#3ef08a" stroke-opacity="0.55" stroke-width="2"/>
-<line x1="1105.2" y1="190.0" x2="654.8" y2="450.0" stroke="#3ef08a" stroke-opacity="0.55" stroke-width="2"/>
-<circle cx="880" cy="320" r="7" fill="#6dfba6"/>
-<path d="M1030 360 A155 155 0 0 0 730 280" fill="none" stroke="#6dfba6" stroke-width="9" stroke-opacity="0.315" filter="url(#blur)" stroke-linecap="round" stroke-linejoin="round"/><path d="M1030 360 A155 155 0 0 0 730 280" fill="none" stroke="#6dfba6" stroke-width="3" stroke-opacity="0.9" stroke-linecap="round" stroke-linejoin="round"/>
-<text x="880" y="620" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="16" fill="#8b9c92">rank-2 subarrangements → relations</text>
-<path d="M90 200 C132.5 200 132.5 280 175.0 280 C217.5 280 217.5 360 260.0 360 C302.5 360 302.5 440 345.0 440 C387.5 440 387.5 440 430.0 440 C472.5 440 472.5 440 515.0 440 C557.5 440 557.5 440 600.0 440" fill="none" stroke="#6dfba6" stroke-width="12" stroke-opacity="0.33249999999999996" filter="url(#blur)" stroke-linecap="round" stroke-linejoin="round"/><path d="M90 200 C132.5 200 132.5 280 175.0 280 C217.5 280 217.5 360 260.0 360 C302.5 360 302.5 440 345.0 440 C387.5 440 387.5 440 430.0 440 C472.5 440 472.5 440 515.0 440 C557.5 440 557.5 440 600.0 440" fill="none" stroke="#6dfba6" stroke-width="4" stroke-opacity="0.95" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M90 280 C132.5 280 132.5 200 175.0 200 C217.5 200 217.5 200 260.0 200 C302.5 200 302.5 200 345.0 200 C387.5 200 387.5 280 430.0 280 C472.5 280 472.5 360 515.0 360 C557.5 360 557.5 360 600.0 360" fill="none" stroke="#3ef08a" stroke-width="12" stroke-opacity="0.33249999999999996" filter="url(#blur)" stroke-linecap="round" stroke-linejoin="round"/><path d="M90 280 C132.5 280 132.5 200 175.0 200 C217.5 200 217.5 200 260.0 200 C302.5 200 302.5 200 345.0 200 C387.5 200 387.5 280 430.0 280 C472.5 280 472.5 360 515.0 360 C557.5 360 557.5 360 600.0 360" fill="none" stroke="#3ef08a" stroke-width="4" stroke-opacity="0.95" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M90 360 C132.5 360 132.5 360 175.0 360 C217.5 360 217.5 280 260.0 280 C302.5 280 302.5 280 345.0 280 C387.5 280 387.5 200 430.0 200 C472.5 200 472.5 200 515.0 200 C557.5 200 557.5 280 600.0 280" fill="none" stroke="#a8ffc9" stroke-width="12" stroke-opacity="0.33249999999999996" filter="url(#blur)" stroke-linecap="round" stroke-linejoin="round"/><path d="M90 360 C132.5 360 132.5 360 175.0 360 C217.5 360 217.5 280 260.0 280 C302.5 280 302.5 280 345.0 280 C387.5 280 387.5 200 430.0 200 C472.5 200 472.5 200 515.0 200 C557.5 200 557.5 280 600.0 280" fill="none" stroke="#a8ffc9" stroke-width="4" stroke-opacity="0.95" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M90 440 C132.5 440 132.5 440 175.0 440 C217.5 440 217.5 440 260.0 440 C302.5 440 302.5 360 345.0 360 C387.5 360 387.5 360 430.0 360 C472.5 360 472.5 280 515.0 280 C557.5 280 557.5 200 600.0 200" fill="none" stroke="#1fd672" stroke-width="12" stroke-opacity="0.33249999999999996" filter="url(#blur)" stroke-linecap="round" stroke-linejoin="round"/><path d="M90 440 C132.5 440 132.5 440 175.0 440 C217.5 440 217.5 440 260.0 440 C302.5 440 302.5 360 345.0 360 C387.5 360 387.5 360 430.0 360 C472.5 360 472.5 280 515.0 280 C557.5 280 557.5 200 600.0 200" fill="none" stroke="#1fd672" stroke-width="4" stroke-opacity="0.95" stroke-linecap="round" stroke-linejoin="round"/>
-<circle cx="90" cy="200" r="7" fill="#050806" stroke="#6dfba6" stroke-width="3"/>
-<circle cx="600" cy="200" r="7" fill="#050806" stroke="#6dfba6" stroke-width="3"/>
-<circle cx="90" cy="280" r="7" fill="#050806" stroke="#6dfba6" stroke-width="3"/>
-<circle cx="600" cy="280" r="7" fill="#050806" stroke="#6dfba6" stroke-width="3"/>
-<circle cx="90" cy="360" r="7" fill="#050806" stroke="#6dfba6" stroke-width="3"/>
-<circle cx="600" cy="360" r="7" fill="#050806" stroke="#6dfba6" stroke-width="3"/>
-<circle cx="90" cy="440" r="7" fill="#050806" stroke="#6dfba6" stroke-width="3"/>
-<circle cx="600" cy="440" r="7" fill="#050806" stroke="#6dfba6" stroke-width="3"/>
-<text x="90" y="110" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="20" fill="#6dfba6">Δ² = full twist</text>
-<text x="90" y="138" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="15" fill="#8b9c92">types A, B, D, H₃, I₂(m)</text>
-<rect width="1200" height="675" fill="url(#fade)"/>
+
+<line x1="620.0" y1="320.0" x2="1140.0" y2="320.0" stroke="#1b1c1a" stroke-opacity="0.55" stroke-width="2"/>
+<line x1="654.8" y1="190.0" x2="1105.2" y2="450.0" stroke="#1b1c1a" stroke-opacity="0.55" stroke-width="2"/>
+<line x1="750.0" y1="94.8" x2="1010.0" y2="545.2" stroke="#1b1c1a" stroke-opacity="0.55" stroke-width="2"/>
+<line x1="880.0" y1="60.0" x2="880.0" y2="580.0" stroke="#1b1c1a" stroke-opacity="0.55" stroke-width="2"/>
+<line x1="1010.0" y1="94.8" x2="750.0" y2="545.2" stroke="#1b1c1a" stroke-opacity="0.55" stroke-width="2"/>
+<line x1="1105.2" y1="190.0" x2="654.8" y2="450.0" stroke="#1b1c1a" stroke-opacity="0.55" stroke-width="2"/>
+<circle cx="880" cy="320" r="7" fill="#0a8a4a"/>
+<path d="M1030 360 A155 155 0 0 0 730 280" fill="none" stroke="#0a8a4a" stroke-width="3" stroke-opacity="0.9" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="880" y="620" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="16" fill="#6f716b">rank-2 subarrangements → relations</text>
+<path d="M90 200 C132.5 200 132.5 280 175.0 280 C217.5 280 217.5 360 260.0 360 C302.5 360 302.5 440 345.0 440 C387.5 440 387.5 440 430.0 440 C472.5 440 472.5 440 515.0 440 C557.5 440 557.5 440 600.0 440" fill="none" stroke="#0a8a4a" stroke-width="4" stroke-opacity="0.95" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M90 280 C132.5 280 132.5 200 175.0 200 C217.5 200 217.5 200 260.0 200 C302.5 200 302.5 200 345.0 200 C387.5 200 387.5 280 430.0 280 C472.5 280 472.5 360 515.0 360 C557.5 360 557.5 360 600.0 360" fill="none" stroke="#1b1c1a" stroke-width="4" stroke-opacity="0.95" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M90 360 C132.5 360 132.5 360 175.0 360 C217.5 360 217.5 280 260.0 280 C302.5 280 302.5 280 345.0 280 C387.5 280 387.5 200 430.0 200 C472.5 200 472.5 200 515.0 200 C557.5 200 557.5 280 600.0 280" fill="none" stroke="#0a8a4a" stroke-width="4" stroke-opacity="0.95" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M90 440 C132.5 440 132.5 440 175.0 440 C217.5 440 217.5 440 260.0 440 C302.5 440 302.5 360 345.0 360 C387.5 360 387.5 360 430.0 360 C472.5 360 472.5 280 515.0 280 C557.5 280 557.5 200 600.0 200" fill="none" stroke="#0a8a4a" stroke-width="4" stroke-opacity="0.95" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="90" cy="200" r="7" fill="#ecebe5" stroke="#0a8a4a" stroke-width="3"/>
+<circle cx="600" cy="200" r="7" fill="#ecebe5" stroke="#0a8a4a" stroke-width="3"/>
+<circle cx="90" cy="280" r="7" fill="#ecebe5" stroke="#0a8a4a" stroke-width="3"/>
+<circle cx="600" cy="280" r="7" fill="#ecebe5" stroke="#0a8a4a" stroke-width="3"/>
+<circle cx="90" cy="360" r="7" fill="#ecebe5" stroke="#0a8a4a" stroke-width="3"/>
+<circle cx="600" cy="360" r="7" fill="#ecebe5" stroke="#0a8a4a" stroke-width="3"/>
+<circle cx="90" cy="440" r="7" fill="#ecebe5" stroke="#0a8a4a" stroke-width="3"/>
+<circle cx="600" cy="440" r="7" fill="#ecebe5" stroke="#0a8a4a" stroke-width="3"/>
+<text x="90" y="110" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="20" fill="#0a8a4a">Δ² = full twist</text>
+<text x="90" y="138" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="15" fill="#6f716b">types A, B, D, H₃, I₂(m)</text>
+
 </svg>

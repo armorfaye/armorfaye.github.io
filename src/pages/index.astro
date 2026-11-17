@@ -1,159 +1,346 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Hero from '../components/Hero.astro';
-import SectionHeader from '../components/SectionHeader.astro';
-import ProjectCard from '../components/ProjectCard.astro';
-import PublicationItem from '../components/PublicationItem.astro';
-import ExperienceItem from '../components/ExperienceItem.astro';
+import LossLandscape from '../components/LossLandscape.astro';
 import SenjuShowcase from '../components/SenjuShowcase.astro';
-import { experienceHighlights, awards } from '../data/experience';
+import PublicationItem from '../components/PublicationItem.astro';
+import AwardList from '../components/AwardList.astro';
+import { experienceHighlights } from '../data/experience';
 import { publications } from '../data/publications';
+import { site, socialLinks } from '../data/site';
 
 const all = await getCollection('projects');
-const projects = all.filter((p) => p.data.featured && p.id !== 'senju').sort((a, b) => a.data.order - b.data.order);
 const senju = all.find((p) => p.id === 'senju')!;
+const projects = all
+  .filter((p) => p.data.featured && p.id !== 'senju')
+  .sort((a, b) => a.data.order - b.data.order);
+
+const ext = { target: '_blank', rel: 'noopener noreferrer' };
+const year = (d: string) => d.match(/\d{4}(?!.*\d{4})/)?.[0] ?? d;
+const pad = (n: number) => String(n).padStart(2, '0');
 
 const now = [
   {
-    where: 'Stanford NLP, Percy Liang’s group',
     title: 'Priced-guidance RL',
-    body: 'Building a guidance-based pipeline for data creation and RL environment generation, and contributing to the next Marin pretraining architecture (~600B).',
+    where: 'Stanford NLP · Percy Liang’s group',
+    body: 'A guidance-based pipeline for data creation and RL environment generation, and the next Marin pretraining architecture (~600B).',
     href: 'https://marin.community',
-    cta: 'marin.community',
   },
   {
-    where: 'Hazy Research, with Hermann Kumbong',
-    title: 'Speculative decoding for NCM',
-    body: 'Speeding up Next-Concept Modeling, which generates text coarse-to-fine, level by level in parallel, instead of one token at a time.',
+    title: 'Efficient inference for NCM',
+    where: 'Hazy Research · with Hermann Kumbong',
+    body: 'Speeding up Next-Concept Modeling, which writes text coarse-to-fine and in parallel instead of one token at a time.',
     href: 'https://hazyresearch.stanford.edu/blog/2026-10-12-ncm',
-    cta: 'About NCM',
-  },
-  {
-    where: 'Hackathon winner',
-    title: 'Senju 千手',
-    body: 'A swarm of computer-use agents with their own cursors, working in your real apps while you keep working.',
-    href: '/projects/senju',
-    cta: 'Project page',
   },
 ];
 ---
 
 <BaseLayout>
-  <Hero />
+  <!-- Hero -->
+  <section data-fig-root>
+    <h1 class="masthead" data-scramble-load>Jerry Liu</h1>
 
-  <!-- Now -->
-  <section class="container-x pt-16">
-    <SectionHeader eyebrow="Now" title="What I’m working on" />
-    <div class="grid gap-x-10 gap-y-10 md:grid-cols-3">
-      {
-        now.map((n, i) => {
-          const external = n.href.startsWith('http');
-          return (
-            <div class="reveal border-t border-line-strong pt-5" style={`--delay: ${i * 80}ms`}>
-              <p class="text-sm text-faint">{n.where}</p>
-              <h3 class="mt-2 text-lg font-semibold text-ink">{n.title}</h3>
-              <p class="mt-2 text-[0.97rem] leading-relaxed text-muted">{n.body}</p>
-              <a
-                href={n.href}
-                target={external ? '_blank' : undefined}
-                rel={external ? 'noopener noreferrer' : undefined}
-                class="mt-4 inline-block text-sm text-accent-400 transition-colors hover:text-accent-300"
-              >
-                {n.cta} {external ? '↗' : '→'}
-              </a>
-            </div>
-          );
-        })
-      }
-    </div>
-  </section>
+    <div class="hero-grid">
+      <div class="h-photo rv">
+        <img
+          src={site.profile}
+          alt="Portrait of Jiayu (Jerry) Liu"
+          width="600"
+          height="600"
+          loading="eager"
+          fetchpriority="high"
+        />
+      </div>
 
-  <!-- Senju -->
-  <section class="container-x pt-32">
-    <div class="grid items-center gap-12 lg:grid-cols-[1fr_1.2fr] lg:gap-14">
-      <div class="reveal min-w-0">
-        <p class="eyebrow">Featured project · Hackathon winner</p>
-        <h2 class="mt-2 text-3xl font-semibold text-ink sm:text-4xl">Senju 千手</h2>
-        <p class="mt-1 text-lg text-muted">A thousand hands on your desktop</p>
-        <p class="mt-6 text-[1.05rem] leading-relaxed text-ink-soft">
-          Type one goal and a lead agent splits it across a swarm of Claude agents. Each one gets its
-          own cursor and works in your real browser and Mac apps, while your mouse and keyboard stay
-          yours. You can step in on any agent mid-task, and nothing is sent in your name without your
-          approval. When a job finishes, the lead saves what it learned as a skill for next time.
+      <div class="h-bio rv" style="--d: 80ms">
+        <p class="lead">
+          I study mathematics at Stanford. Most of all, I’m interested in self-improving AI: models
+          that generate their own data, environments, and feedback, and get better from it.
         </p>
-        <p class="mt-4 text-[0.97rem] text-muted">
-          Won the Ricursive Intelligence Hackathon.
+        <p class="sub">
+          Now: Percy Liang’s group at Stanford NLP on{' '}
+          <a href="https://marin.community" class="ul" {...ext}>Marin</a>, and{' '}
+          <a href="https://hazyresearch.stanford.edu" class="ul" {...ext}>Hazy Research</a> on
+          efficient inference. Past: pretraining at StepFun, pose transformers at MIT, and
+          configuration spaces with Charles Fefferman at Princeton.
         </p>
-        <div class="mt-8 flex flex-wrap items-center gap-3">
-          <a href="/projects/senju" class="btn-primary">How it works</a>
+        <p class="mono h-links">
           {
-            senju.data.links.map((l) => (
-              <a href={l.url} target="_blank" rel="noopener noreferrer" class="btn-secondary">
+            socialLinks.map((l) => (
+              <a href={l.url} class="tlink" {...(l.url.startsWith('http') ? ext : {})} data-scramble>
                 {l.label}
               </a>
             ))
           }
+          <a href={site.resume} class="tlink" data-scramble>CV</a>
+        </p>
+      </div>
+
+      <figure class="h-fig rv" style="--d: 160ms">
+        <div class="h-canvas"><LossLandscape cell={10} /></div>
+        <figcaption class="mono-lc dim">
+          <span class="truncate">fig. 1 · <button type="button" class="fig-opt" data-fig-opt title="Switch optimizer">sgd + momentum</button> · <span data-fig-caption></span></span>
+          <span class="h-hint">click to drop a ball</span>
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 01 Now -->
+  <section class="sec mt-[clamp(48px,6vw,96px)]">
+    <h2 class="sec-label mono"><span class="idx">01</span><span data-scramble>Now</span></h2>
+    <div class="sec-body">
+      <ul class="now">
+        {
+          now.map((n) => (
+            <li class="rv">
+              <a href={n.href} {...ext} class="now-item">
+                <span class="now-title">
+                  {n.title} <span class="arr">↗</span>
+                </span>
+                <span class="mono dim">{n.where}</span>
+                <span class="now-body">{n.body}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- 02 Work -->
+  <section class="sec">
+    <h2 class="sec-label mono"><span class="idx">02</span><span data-scramble>Work</span></h2>
+    <div class="sec-body">
+      <a href="/projects/senju" class="feature rv">
+        <div class="feature-demo"><SenjuShowcase /></div>
+        <div class="feature-text">
+          <p class="mono accent">Winner — Ricursive Intelligence Hackathon</p>
+          <h3 class="feature-title">Senju 千手 <span class="arr">→</span></h3>
+          <p class="feature-body">{senju.data.tagline}</p>
         </div>
-      </div>
-      <div class="reveal min-w-0" style="--delay: 120ms">
-        <SenjuShowcase />
-      </div>
+      </a>
+
+      <ul class="rows-big">
+        {
+          projects.map((p, i) => (
+            <li class="rv">
+              <a href={`/projects/${p.id}`} class="row-big" data-img={p.data.thumbnail}>
+                <span class="mono dim">{pad(i + 2)}</span>
+                <span class="main">
+                  <span class="title">{p.data.title.split(':')[0]}</span>
+                  <span class="tag">{p.data.tagline}</span>
+                </span>
+                <span class="mono dim">{year(p.data.dates)}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="mono mt-6"><a href="/projects" class="tlink">All projects <span class="arr">→</span></a></p>
     </div>
   </section>
 
-  <!-- Projects -->
-  <section class="container-x pt-32">
-    <SectionHeader eyebrow="Projects" title="Selected work" link={{ label: 'All projects', href: '/projects' }} />
-    <div class="grid gap-x-8 gap-y-14 md:grid-cols-2">
-      {
-        projects.map((p, i) => (
-          <div class="reveal" style={`--delay: ${(i % 2) * 80}ms`}>
-            <ProjectCard
-              slug={p.id}
-              title={p.data.title}
-              summary={p.data.summary}
-              dates={p.data.dates}
-              thumbnail={p.data.thumbnail}
-              award={p.data.award}
-            />
-          </div>
-        ))
-      }
+  <!-- 03 Papers -->
+  <section class="sec">
+    <h2 class="sec-label mono"><span class="idx">03</span><span data-scramble>Papers</span></h2>
+    <div class="sec-body">
+      <ul class="papers">
+        {publications.map((pub) => <PublicationItem pub={pub} compact />)}
+      </ul>
+      <p class="mono mt-6"><a href="/research" class="tlink">All research <span class="arr">→</span></a></p>
     </div>
   </section>
 
-  <!-- Publications -->
-  <section class="container-x pt-32">
-    <SectionHeader eyebrow="Publications" title="Papers" link={{ label: 'All research', href: '/research' }} />
-    <div class="reveal border-b border-line">
-      {publications.map((pub) => <PublicationItem pub={pub} compact />)}
+  <!-- 04 Experience -->
+  <section class="sec">
+    <h2 class="sec-label mono"><span class="idx">04</span><span data-scramble>Experience</span></h2>
+    <div class="sec-body">
+      <ul class="table">
+        {
+          experienceHighlights.map((e) => (
+            <li class="rv">
+              <span class="mono dim">{e.dates}</span>
+              <span class="t-main">{e.org}</span>
+              <span class="t-sub">{e.role}</span>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="mono mt-6"><a href={site.resume} class="tlink">Full CV <span class="arr">↗</span></a></p>
     </div>
   </section>
 
-  <!-- Experience -->
-  <section class="container-x pt-32">
-    <SectionHeader eyebrow="Experience" title="Where I’ve worked" link={{ label: 'Full experience', href: '/experience' }} />
-    <ul class="border-b border-line">
-      {experienceHighlights.map((entry, i) => <ExperienceItem entry={entry} delay={i * 50} showBullets={false} />)}
-    </ul>
-  </section>
-
-  <!-- Honors -->
-  <section class="container-x pt-24">
-    <SectionHeader eyebrow="Honors" title="Recognition" />
-    <ul class="reveal border-b border-line">
-      {
-        awards.map((a) => (
-          <li class="grid gap-1 border-t border-line py-5 sm:grid-cols-[10rem_1fr] sm:gap-6">
-            <p class="text-sm tabular-nums text-faint">{a.year ?? ''}</p>
-            <p class="text-[1.02rem] text-ink">
-              {a.link ? <a href={a.link} class="font-semibold transition-colors hover:text-accent-300">{a.title}</a> : <span class="font-semibold">{a.title}</span>}
-              <span class="text-muted"> · {a.detail}</span>
-            </p>
-          </li>
-        ))
-      }
-    </ul>
+  <!-- 05 Honors -->
+  <section class="sec">
+    <h2 class="sec-label mono"><span class="idx">05</span><span data-scramble>Honors</span></h2>
+    <div class="sec-body">
+      <AwardList />
+    </div>
   </section>
 </BaseLayout>
+
+<style>
+  .masthead {
+    font-weight: 500;
+    color: var(--color-ink);
+    font-size: clamp(76px, 15.2vw, 228px);
+    line-height: 0.82;
+    letter-spacing: -0.032em;
+    margin: clamp(28px, 5vw, 64px) 0 clamp(24px, 3vw, 40px) -0.04em;
+    white-space: nowrap;
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 24px;
+    border-top: 1px solid var(--color-line);
+    padding-top: 24px;
+  }
+  .h-photo {
+    grid-column: 1 / 3;
+  }
+  .h-photo img {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+    object-position: 50% 30%;
+  }
+  .h-bio {
+    grid-column: 3 / 7;
+    padding-left: 8px;
+  }
+  .sub {
+    margin-top: 18px;
+    color: var(--color-ink-soft);
+    max-width: 46ch;
+  }
+  .h-links {
+    margin-top: 26px;
+    display: flex;
+    gap: 22px;
+  }
+  .h-fig {
+    grid-column: 7 / 13;
+    display: flex;
+    flex-direction: column;
+    min-height: 300px;
+    margin: 0;
+  }
+  .h-canvas {
+    position: relative;
+    flex: 1;
+    min-height: 260px;
+    color: #2f312d;
+  }
+  .h-canvas :global(canvas) {
+    position: absolute;
+    inset: 0;
+  }
+  .h-fig figcaption {
+    margin-top: 8px;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    white-space: nowrap;
+  }
+  .h-hint {
+    color: var(--color-faint);
+  }
+  @media (hover: none), (max-width: 560px) {
+    .h-hint {
+      display: none;
+    }
+  }
+  @media (max-width: 1000px) {
+    .h-photo {
+      grid-column: 1 / 4;
+    }
+    .h-bio {
+      grid-column: 4 / 13;
+    }
+    .h-fig {
+      grid-column: 1 / 13;
+      min-height: 0;
+    }
+    .h-canvas {
+      flex: none;
+      height: clamp(170px, 44vw, 380px);
+    }
+  }
+  @media (max-width: 560px) {
+    .h-photo {
+      grid-column: 1 / 7;
+    }
+    .h-bio {
+      grid-column: 1 / 13;
+      padding-left: 0;
+    }
+  }
+
+  /* Now */
+  .now {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+  }
+  .now-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .now-title {
+    font-size: clamp(22px, 2.1vw, 30px);
+    font-weight: 500;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+    color: var(--color-ink);
+    transition: color 0.2s;
+  }
+  .now-item:hover .now-title {
+    color: var(--accent);
+  }
+  .now-body {
+    margin-top: 6px;
+    max-width: 44ch;
+  }
+  @media (max-width: 760px) {
+    .now {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Senju feature */
+  .feature {
+    display: block;
+    margin-bottom: 48px;
+  }
+  .feature-demo {
+    pointer-events: none;
+    max-width: 820px;
+  }
+  .feature-text {
+    margin-top: 22px;
+  }
+  .feature-title {
+    margin-top: 8px;
+    font-size: clamp(30px, 3.4vw, 48px);
+    font-weight: 500;
+    letter-spacing: -0.035em;
+    line-height: 1.05;
+    color: var(--color-ink);
+    transition: color 0.2s;
+  }
+  .feature:hover .feature-title {
+    color: var(--accent);
+  }
+  .feature-body {
+    margin-top: 10px;
+    max-width: 52ch;
+  }
+
+  .papers :global(.pub:first-child) {
+    padding-top: 0;
+  }
+</style>

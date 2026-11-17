@@ -1,195 +1,374 @@
 ---
-// Animated illustration of Senju: a lead agent dispatching worker agents,
-// each with its own ghost cursor, across real app windows on one desktop.
-// Pure CSS/SVG motion; the log lines rotate with a tiny script.
+// Animated diagram of Senju: a lead agent dispatching three workers, each with
+// its own cursor, across app windows on one desktop. Drawn as a light technical
+// figure (thin rules, mono labels, green only for the agents) to match the site.
 const workers = [
-  { id: 'w1', label: 'worker·1', cls: 'c1' },
-  { id: 'w2', label: 'worker·2', cls: 'c2' },
-  { id: 'w3', label: 'worker·3', cls: 'c3' },
+  { label: 'w1', cls: 'c1' },
+  { label: 'w2', cls: 'c2' },
+  { label: 'w3', cls: 'c3' },
 ];
 const log = [
-  ['lead', 'split goal → 3 tasks, spawning workers'],
+  ['lead', 'split goal into 3 tasks, spawning workers'],
   ['w1', 'browser › searching flights SFO → JFK'],
   ['w2', 'sheets › filling row 14 with quotes'],
   ['w3', 'mail › drafting summary for the team'],
-  ['lead', 'w1 found cheaper fare → replanning'],
-  ['w3', 'awaiting approval: send as you?'],
-  ['you', 'approved ✓'],
-  ['lead', 'job done · writing retrospective → skill.md'],
+  ['lead', 'w1 found a cheaper fare, replanning'],
+  ['w3', 'waiting for approval: send as you?'],
+  ['you', 'approved'],
+  ['lead', 'done · retrospective saved to skill.md'],
 ];
+const arrow = 'M4 2.5 19.5 12l-6.6 1.4L16.6 21l-2.9 1.3-3.7-7.6L4 19V2.5Z';
 ---
 
-<div class="senju-demo relative" aria-label="Animated illustration of Senju running three agents on one desktop" role="img">
-  <div
-    class="relative overflow-hidden rounded-2xl border border-line-strong bg-void shadow-[0_30px_80px_-40px_rgb(37_196_112/0.35)]"
-  >
-    <!-- Desktop wallpaper -->
-    <div
-      class="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_0%,rgb(31_214_114/0.18),transparent_60%),radial-gradient(ellipse_at_100%_100%,rgb(31_214_114/0.08),transparent_50%)]"
-    >
-    </div>
+<figure class="senju" aria-label="Animated diagram of Senju running three agents on one desktop" role="img">
+  <div class="prompt">
+    <span class="kanji">千手</span>
+    <span class="sep">›</span>
+    <span class="text">plan my NYC trip, log quotes in the sheet, and email the team<span class="caret"></span></span>
+    <span class="keys">⌘⇧␣</span>
+  </div>
 
-    <!-- Prompt bar -->
-    <div class="relative z-10 mx-auto mt-4 flex w-[88%] items-center gap-2 rounded-xl border border-accent-500/40 bg-surface/90 px-3 py-2  backdrop-blur">
-      <span class="shrink-0 whitespace-nowrap font-display text-sm font-bold text-accent-300">千手</span>
-      <span class="h-4 w-px bg-line-strong"></span>
-      <span class="truncate font-mono text-[0.68rem] text-ink-soft sm:text-xs">
-        plan my NYC trip, log quotes in the sheet, and email the team
-      </span>
-      <span class="ml-auto hidden shrink-0 whitespace-nowrap rounded border border-line-strong px-1.5 py-0.5 font-mono text-[0.6rem] text-faint sm:inline">⌘⇧␣</span>
-    </div>
+  <div class="stage">
+    <svg class="links" viewBox="0 0 160 100" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M80 14 L80 20 L26 20 L26 30" class="flow"></path>
+      <path d="M80 14 L80 20 L134 20 L134 28" class="flow"></path>
+      <path d="M80 14 L80 58" class="flow"></path>
+    </svg>
 
-    <!-- Stage -->
-    <div class="relative z-0 mx-auto aspect-[16/10] w-full">
-      <!-- Connection lines from the lead -->
-      <svg class="absolute inset-0 h-full w-full" viewBox="0 0 160 100" preserveAspectRatio="none" aria-hidden="true">
-        <defs>
-          <linearGradient id="senju-line" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0" stop-color="#3ef08a" stop-opacity="0.9"></stop>
-            <stop offset="1" stop-color="#3ef08a" stop-opacity="0.1"></stop>
-          </linearGradient>
-        </defs>
-        <path d="M80 12 C 60 20, 35 22, 28 34" class="flow" stroke="url(#senju-line)"></path>
-        <path d="M80 12 C 100 22, 120 24, 128 32" class="flow" stroke="url(#senju-line)"></path>
-        <path d="M80 12 C 82 40, 78 52, 80 62" class="flow" stroke="url(#senju-line)"></path>
-      </svg>
+    <div class="lead"><span class="dot"></span>lead</div>
 
-      <!-- Lead node -->
-      <div class="absolute left-1/2 top-[6%] z-20 -translate-x-1/2">
-        <div class="flex items-center gap-1.5 rounded-full border border-accent-400/60 bg-accent-400/15 px-2.5 py-1 font-mono text-[0.6rem] text-accent-200  backdrop-blur">
-          <span class="inline-block h-1.5 w-1.5 rounded-full bg-accent-400"></span> lead
+    <div class="win w-flights">
+      <div class="bar"><span>01</span>flights</div>
+      <div class="body">
+        <div class="ln" style="width: 72%"></div>
+        <div class="fields">
+          <div class="field"></div>
+          <div class="field hl"></div>
         </div>
-      </div>
-
-      <!-- Window: browser -->
-      <div class="win left-[4%] top-[26%] w-[40%]">
-        <div class="win-bar"><i></i><i></i><i></i><span>flights</span></div>
-        <div class="space-y-1.5 p-2">
-          <div class="h-2 w-3/4 rounded bg-line-strong"></div>
-          <div class="flex gap-1.5">
-            <div class="h-6 flex-1 rounded border border-line bg-raised"></div>
-            <div class="h-6 flex-1 rounded border border-accent-500/50 bg-accent-500/10 hl"></div>
-          </div>
-          <div class="h-2 w-1/2 rounded bg-line"></div>
-          <div class="h-2 w-2/3 rounded bg-line"></div>
-        </div>
-      </div>
-
-      <!-- Window: sheet -->
-      <div class="win right-[4%] top-[24%] w-[40%]">
-        <div class="win-bar"><i></i><i></i><i></i><span>quotes.xlsx</span></div>
-        <div class="grid grid-cols-4 gap-px bg-line p-px">
-          {
-            Array.from({ length: 16 }).map((_, i) => (
-              <div class:list={['h-3 bg-raised', i === 9 && 'cell-fill']} />
-            ))
-          }
-        </div>
-      </div>
-
-      <!-- Window: mail -->
-      <div class="win left-[30%] top-[58%] w-[40%]">
-        <div class="win-bar"><i></i><i></i><i></i><span>mail · draft</span></div>
-        <div class="space-y-1.5 p-2">
-          <div class="h-2 w-1/3 rounded bg-line-strong"></div>
-          <div class="typing h-2 rounded bg-accent-500/40"></div>
-          <div class="h-2 w-4/5 rounded bg-line"></div>
-          <div class="ml-auto mt-1 w-fit rounded border border-amber-300/50 bg-amber-300/10 px-1.5 py-0.5 font-mono text-[0.5rem] text-amber-200 approve">
-            approve send?
-          </div>
-        </div>
-      </div>
-
-      <!-- Ghost cursors -->
-      {
-        workers.map((w) => (
-          <div class:list={['ghost', w.cls]}>
-            <svg viewBox="0 0 24 24" class="h-4 w-4 drop-shadow-[0_0_6px_rgb(62_240_138/0.9)] sm:h-5 sm:w-5">
-              <path d="M4 2.5 19.5 12l-6.6 1.4L16.6 21l-2.9 1.3-3.7-7.6L4 19V2.5Z" fill="#3ef08a" stroke="#030504" stroke-width="1.2" />
-            </svg>
-            <span class="ml-3 rounded bg-accent-400 px-1 font-mono text-[0.5rem] font-semibold text-void sm:text-[0.55rem]">{w.label}</span>
-          </div>
-        ))
-      }
-
-      <!-- Your own cursor, idle in the corner -->
-      <div class="absolute bottom-[8%] right-[7%] z-30 flex items-start opacity-80">
-        <svg viewBox="0 0 24 24" class="h-4 w-4 sm:h-5 sm:w-5">
-          <path d="M4 2.5 19.5 12l-6.6 1.4L16.6 21l-2.9 1.3-3.7-7.6L4 19V2.5Z" fill="#eaf2ed" stroke="#030504" stroke-width="1.2" />
-        </svg>
-        <span class="ml-1 rounded bg-ink px-1 font-mono text-[0.5rem] font-semibold text-void sm:text-[0.55rem]">you</span>
+        <div class="ln" style="width: 48%"></div>
+        <div class="ln" style="width: 62%"></div>
       </div>
     </div>
 
-    <!-- Activity log -->
-    <div class="relative z-10 border-t border-line bg-surface/90 px-4 py-2.5 font-mono text-[0.65rem] sm:text-[0.7rem]">
-      <ul class="senju-log h-[3.6em] overflow-hidden leading-[1.8em]" aria-hidden="true" data-lines={JSON.stringify(log)}>
-        {
-          log.slice(0, 2).map(([who, msg]) => (
-            <li class="truncate">
-              <span class="text-accent-400">{who}</span> <span class="text-faint">›</span> <span class="text-ink-soft">{msg}</span>
-            </li>
-          ))
-        }
-      </ul>
+    <div class="win w-sheet">
+      <div class="bar"><span>02</span>quotes.xlsx</div>
+      <div class="sheet">
+        {Array.from({ length: 16 }).map((_, i) => <div class:list={['cell', i === 9 && 'fill']} />)}
+      </div>
+    </div>
+
+    <div class="win w-mail">
+      <div class="bar"><span>03</span>mail · draft</div>
+      <div class="body">
+        <div class="ln" style="width: 34%"></div>
+        <div class="ln typing"></div>
+        <div class="ln" style="width: 80%"></div>
+        <div class="approve">approve send? [y/n]</div>
+      </div>
+    </div>
+
+    {
+      workers.map((w) => (
+        <div class:list={['ghost', w.cls]}>
+          <svg viewBox="0 0 24 24">
+            <path d={arrow} class="agent" />
+          </svg>
+          <span class="tag">{w.label}</span>
+        </div>
+      ))
+    }
+
+    <div class="ghost you">
+      <svg viewBox="0 0 24 24"><path d={arrow} class="human" /></svg>
+      <span class="tag tag-you">you</span>
     </div>
   </div>
-</div>
+
+  <div class="log">
+    <ul class="senju-log" aria-hidden="true" data-lines={JSON.stringify(log)}>
+      {
+        log.slice(0, 2).map(([who, msg]) => (
+          <li>
+            <span class:list={['who', who === 'you' && 'is-you']}>{who}</span> <span class="msg">{msg}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</figure>
 
 <style>
-  .win {
-    position: absolute;
-    z-index: 10;
+  .senju {
+    --ink: var(--color-ink);
+    --rule: var(--color-line-strong);
+    --soft: var(--color-line);
+    --agent: var(--color-accent-500);
+    position: relative;
+    margin: 0;
+    border: 1px solid var(--ink);
+    background:
+      radial-gradient(circle, var(--color-line-strong) 0.8px, transparent 1px) 0 0 / 14px 14px,
+      var(--color-bg);
+    font-family: var(--font-mono);
+    color: var(--ink);
     overflow: hidden;
-    border-radius: 0.6rem;
-    border: 1px solid var(--color-line-strong);
-    background: color-mix(in oklab, var(--color-surface) 92%, transparent);
-    box-shadow: 0 20px 40px -20px rgb(0 0 0 / 0.9);
   }
-  .win-bar {
+
+  .prompt {
     display: flex;
     align-items: center;
-    gap: 3px;
-    border-bottom: 1px solid var(--color-line);
-    padding: 4px 6px;
-    font-family: var(--font-mono);
-    font-size: 0.5rem;
-    color: var(--color-faint);
+    gap: 10px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--ink);
+    background: var(--color-bg);
+    font-size: 13px;
+    white-space: nowrap;
   }
-  .win-bar i {
-    width: 5px;
-    height: 5px;
-    border-radius: 9999px;
-    background: var(--color-line-strong);
+  .kanji {
+    font-family: var(--font-display);
+    font-weight: 600;
+    color: var(--color-accent-600);
   }
-  .win-bar span {
-    margin-left: 4px;
+  .sep {
+    color: var(--color-muted);
+  }
+  .text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+  .caret {
+    display: inline-block;
+    width: 7px;
+    height: 13px;
+    margin-left: 2px;
+    vertical-align: -2px;
+    background: var(--ink);
+    animation: blink 1s steps(1) infinite;
+  }
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+  .keys {
+    margin-left: auto;
+    padding: 0 5px;
+    border: 1px solid var(--rule);
+    font-size: 10px;
+    color: var(--color-muted);
+  }
+  @media (max-width: 560px) {
+    .keys {
+      display: none;
+    }
+  }
+
+  .stage {
+    position: relative;
+    aspect-ratio: 16 / 9.5;
+  }
+  .links {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
   }
   .flow {
     fill: none;
-    stroke-width: 1.4;
-    stroke-dasharray: 2 2;
-    animation: flow 1.2s linear infinite;
+    stroke: var(--ink);
+    stroke-width: 1;
+    stroke-dasharray: 3 3;
     vector-effect: non-scaling-stroke;
+    animation: flow 1.4s linear infinite;
   }
   @keyframes flow {
     to {
-      stroke-dashoffset: -8;
+      stroke-dashoffset: -12;
+    }
+  }
+
+  .lead {
+    position: absolute;
+    left: 50%;
+    top: 6%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 9px;
+    border: 1px solid var(--ink);
+    background: var(--ink);
+    color: var(--color-bg);
+    font-size: 12px;
+    z-index: 2;
+  }
+  .dot {
+    width: 6px;
+    height: 6px;
+    background: var(--color-accent-400);
+    animation: blink 1.6s steps(1) infinite;
+  }
+
+  .win {
+    position: absolute;
+    z-index: 1;
+    width: 40%;
+    border: 1px solid var(--ink);
+    background: var(--color-bg);
+  }
+  .w-flights {
+    left: 4%;
+    top: 30%;
+  }
+  .w-sheet {
+    right: 4%;
+    top: 28%;
+  }
+  .w-mail {
+    left: 30%;
+    top: 61%;
+  }
+  .bar {
+    display: flex;
+    gap: 8px;
+    padding: 3px 7px;
+    border-bottom: 1px solid var(--ink);
+    font-size: 11px;
+  }
+  .bar span {
+    color: var(--color-muted);
+  }
+  .body {
+    display: grid;
+    gap: 6px;
+    padding: 8px;
+  }
+  .ln {
+    height: 5px;
+    background: var(--soft);
+  }
+  .fields {
+    display: flex;
+    gap: 6px;
+  }
+  .field {
+    flex: 1;
+    height: 20px;
+    border: 1px solid var(--rule);
+  }
+  .field.hl {
+    animation: hl 7s ease-in-out infinite;
+  }
+  @keyframes hl {
+    0%,
+    30%,
+    70%,
+    100% {
+      border-color: var(--rule);
+      background: transparent;
+    }
+    40%,
+    60% {
+      border-color: var(--agent);
+      background: color-mix(in oklab, var(--agent) 14%, transparent);
+    }
+  }
+  .sheet {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--soft);
+  }
+  .cell {
+    height: 12px;
+    background: var(--color-bg);
+  }
+  .cell.fill {
+    animation: fill 8s ease-in-out infinite;
+  }
+  @keyframes fill {
+    0%,
+    45% {
+      background: var(--color-bg);
+    }
+    55%,
+    100% {
+      background: var(--agent);
+    }
+  }
+  .typing {
+    background: var(--agent);
+    opacity: 0.6;
+    animation: typing 9s steps(14) infinite;
+  }
+  @keyframes typing {
+    0% {
+      width: 0;
+    }
+    50%,
+    100% {
+      width: 88%;
+    }
+  }
+  .approve {
+    justify-self: end;
+    padding: 1px 6px;
+    border: 1px solid var(--ink);
+    font-size: 10px;
+    animation: approve 9s ease-in-out infinite;
+  }
+  @keyframes approve {
+    0%,
+    55%,
+    100% {
+      opacity: 0;
+    }
+    65%,
+    90% {
+      opacity: 1;
     }
   }
 
   .ghost {
     position: absolute;
-    z-index: 30;
+    z-index: 3;
     display: flex;
     align-items: flex-start;
     left: 0;
     top: 0;
-    will-change: transform;
   }
-  .ghost span {
-    margin-top: 12px;
-    margin-left: -2px;
+  .ghost svg {
+    width: 18px;
+    height: 18px;
+  }
+  .agent {
+    fill: var(--agent);
+    stroke: var(--ink);
+    stroke-width: 1.2;
+  }
+  .human {
+    fill: var(--color-bg);
+    stroke: var(--ink);
+    stroke-width: 1.2;
+  }
+  .tag {
+    margin: 13px 0 0 -3px;
+    padding: 0 4px;
+    background: var(--agent);
+    color: var(--ink);
+    font-size: 11px;
+    line-height: 16px;
+  }
+  .tag-you {
+    background: var(--ink);
+    color: var(--color-bg);
+  }
+  .you {
+    left: auto;
+    top: auto;
+    right: 6%;
+    bottom: 7%;
   }
   .c1 {
     animation: g1 7s cubic-bezier(0.6, 0, 0.3, 1) infinite;
@@ -200,120 +379,85 @@ const log = [
   .c3 {
     animation: g3 9s cubic-bezier(0.6, 0, 0.3, 1) infinite;
   }
-  /* Positions are percentages of the stage via left/top. */
   @keyframes g1 {
     0%,
     100% {
       left: 14%;
-      top: 34%;
+      top: 40%;
     }
-    25% {
-      left: 32%;
-      top: 38%;
-    }
+    25%,
     45% {
-      left: 32%;
-      top: 38%;
+      left: 33%;
+      top: 44%;
     }
     70% {
       left: 20%;
-      top: 47%;
+      top: 52%;
     }
   }
   @keyframes g2 {
     0%,
     100% {
       left: 64%;
-      top: 32%;
+      top: 36%;
     }
     30% {
       left: 76%;
-      top: 40%;
+      top: 42%;
     }
     55% {
       left: 70%;
-      top: 44%;
+      top: 45%;
     }
     80% {
       left: 86%;
-      top: 36%;
+      top: 38%;
     }
   }
   @keyframes g3 {
     0%,
     100% {
       left: 38%;
-      top: 66%;
+      top: 70%;
     }
     35% {
       left: 52%;
-      top: 70%;
-    }
-    65% {
-      left: 62%;
-      top: 80%;
-    }
-    85% {
-      left: 62%;
-      top: 80%;
-    }
-  }
-  .hl {
-    animation: hl 7s ease-in-out infinite;
-  }
-  @keyframes hl {
-    0%,
-    30% {
-      box-shadow: none;
-    }
-    40%,
-    60% {
-      box-shadow: 0 0 0 2px rgb(62 240 138 / 0.7);
-    }
-  }
-  .cell-fill {
-    animation: cell 8s ease-in-out infinite;
-  }
-  @keyframes cell {
-    0%,
-    45% {
-      background: var(--color-raised);
-    }
-    55%,
-    100% {
-      background: rgb(62 240 138 / 0.55);
-    }
-  }
-  .typing {
-    animation: typing 9s steps(14) infinite;
-  }
-  @keyframes typing {
-    0% {
-      width: 0;
-    }
-    50%,
-    100% {
-      width: 90%;
-    }
-  }
-  .approve {
-    animation: approve 9s ease-in-out infinite;
-  }
-  @keyframes approve {
-    0%,
-    55% {
-      opacity: 0;
+      top: 74%;
     }
     65%,
-    90% {
-      opacity: 1;
-    }
-    100% {
-      opacity: 0;
+    85% {
+      left: 62%;
+      top: 84%;
     }
   }
+
+  .log {
+    border-top: 1px solid var(--ink);
+    background: var(--color-bg);
+    padding: 8px 14px;
+    font-size: 12.5px;
+  }
+  .senju-log {
+    height: 3.6em;
+    overflow: hidden;
+    line-height: 1.8em;
+  }
   .senju-log :global(li) {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     animation: logIn 0.4s ease;
+  }
+  .senju-log :global(.who) {
+    display: inline-block;
+    min-width: 4ch;
+    color: var(--color-accent-600);
+  }
+  .senju-log :global(.who.is-you) {
+    color: var(--ink);
+  }
+  .senju-log :global(.msg) {
+    color: var(--color-ink-soft);
   }
   @keyframes logIn {
     from {
@@ -328,25 +472,18 @@ const log = [
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const lines: [string, string][] = JSON.parse(ul.dataset.lines ?? '[]');
     let i = 2;
-    const render = (who: string, msg: string) => {
-      const li = document.createElement('li');
-      li.className = 'truncate';
-      const a = document.createElement('span');
-      a.className = who === 'you' ? 'text-ink' : 'text-accent-400';
-      a.textContent = who;
-      const sep = document.createElement('span');
-      sep.className = 'text-faint';
-      sep.textContent = ' › ';
-      const b = document.createElement('span');
-      b.className = 'text-ink-soft';
-      b.textContent = msg;
-      li.append(a, sep, b);
-      return li;
-    };
     setInterval(() => {
       if (document.hidden) return;
       const [who, msg] = lines[i % lines.length];
-      ul.appendChild(render(who, msg));
+      const li = document.createElement('li');
+      const a = document.createElement('span');
+      a.className = who === 'you' ? 'who is-you' : 'who';
+      a.textContent = who;
+      const b = document.createElement('span');
+      b.className = 'msg';
+      b.textContent = msg;
+      li.append(a, ' ', b);
+      ul.appendChild(li);
       while (ul.children.length > 2) ul.removeChild(ul.firstElementChild!);
       i++;
     }, 1900);

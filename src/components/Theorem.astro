@@ -7,10 +7,8 @@ interface Props {
 const { label = 'Theorem', kind = 'theorem' } = Astro.props;
 ---
 
-<div class="my-8 rounded-xl border border-line bg-surface px-5 py-4">
-  <p class:list={['mb-1.5 text-sm font-semibold', kind === 'proof' ? 'text-muted' : 'text-accent-400']}>
-    {label}
-  </p>
+<div class:list={['my-8 border-l py-1 pl-5', kind === 'proof' ? 'border-line-strong' : 'border-ink']}>
+  <p class:list={['mono mb-2', kind === 'proof' ? 'dim' : 'accent']}>{label}</p>
   <div class:list={['[&_p]:my-0', kind === 'proof' ? 'text-ink-soft' : 'italic text-ink']}>
     <slot />
   </div>

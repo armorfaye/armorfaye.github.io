@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import ProjectLayout from '../../layouts/ProjectLayout.astro';
+import SenjuShowcase from '../../components/SenjuShowcase.astro';
 
 export async function getStaticPaths() {
   const projects = await getCollection('projects');
@@ -14,6 +15,15 @@ const { project } = Astro.props;
 const { Content } = await render(project);
 ---
 
-<ProjectLayout data={project.data}>
-  <Content />
-</ProjectLayout>
+{
+  project.id === 'senju' ? (
+    <ProjectLayout data={project.data} hasFigure>
+      <SenjuShowcase slot="figure" />
+      <Content />
+    </ProjectLayout>
+  ) : (
+    <ProjectLayout data={project.data}>
+      <Content />
+    </ProjectLayout>
+  )
+}

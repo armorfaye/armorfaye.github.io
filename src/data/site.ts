@@ -12,10 +12,10 @@ export const site = {
     'Jiayu (Jerry) Liu — Stanford mathematics undergraduate doing LLM research (Marin, Hazy Research), with publications in topology, analysis, and machine learning.',
   url: 'https://armorfaye.github.io',
   ogImage: '/images/og-default.png',
-  email: 'jerryliu200710@gmail.com',
+  email: 'jerryl07@stanford.edu',
   // Resume lives in public/docs. To update it, replace the file and keep the path.
   resume: '/docs/Jerry_Liu_Resume.pdf',
-  profile: '/images/profile-dark.jpg',
+  profile: '/images/profile-light.jpg',
   location: 'Stanford, CA',
 } as const;
 
@@ -32,7 +32,6 @@ export const socialLinks = [
 export const navLinks = [
   { label: 'Research', href: '/research' },
   { label: 'Projects', href: '/projects' },
-  { label: 'Experience', href: '/experience' },
 ] as const;
 
 // Organizations shown in the scrolling strip on the home page.

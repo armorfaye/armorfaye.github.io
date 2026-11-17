@@ -1,19 +1,17 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import TopologyCanvas from '../components/TopologyCanvas.astro';
+import LossLandscape from '../components/LossLandscape.astro';
 ---
 
 <BaseLayout title="Page not found" description="The page you're looking for doesn't exist.">
-  <div class="container-x flex flex-col items-center py-20 text-center">
-    <div class="relative h-56 w-56">
-      <TopologyCanvas class="absolute -inset-1/4" />
-      <p class="absolute inset-0 grid place-items-center text-7xl font-semibold text-ink">404</p>
-    </div>
-    <h1 class="mt-8 text-3xl font-semibold text-ink">This page doesn’t exist.</h1>
-    <p class="mt-3 text-muted">It may have moved, or the link is wrong.</p>
-    <div class="mt-10 flex flex-wrap justify-center gap-3">
-      <a href="/" class="btn-primary">Home</a>
-      <a href="/research" class="btn-secondary">Research</a>
+  <h1 class="page-title" data-scramble-load>404</h1>
+  <div class="page-intro" data-fig-root>
+    <p class="mono dim">Not found</p>
+    <div class="lead">
+      <p>This page doesn’t exist. Like the optimizer below, try another starting point:{' '}
+        <a href="/" class="ul">home</a> or <a href="/research" class="ul">research</a>.</p>
+      <div class="mt-8 h-[300px] text-[#4a4c47]"><LossLandscape cell={10} /></div>
+      <p class="mono-lc dim mt-2"><button type="button" class="fig-opt" data-fig-opt title="Switch optimizer">sgd + momentum</button> · <span data-fig-caption></span></p>
     </div>
   </div>
 </BaseLayout>

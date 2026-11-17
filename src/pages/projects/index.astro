@@ -1,88 +1,46 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import SectionHeader from '../../components/SectionHeader.astro';
-import ProjectCard from '../../components/ProjectCard.astro';
-import { categories } from '../../data/categories';
 
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
-const [lead, ...rest] = projects;
-
-const filters = [
-  { id: 'all', label: 'All' },
-  ...categories.filter((c) => projects.some((p) => p.data.categories.includes(c.id))),
-];
+const year = (d: string) => d.match(/\d{4}(?!.*\d{4})/)?.[0] ?? d;
+const pad = (n: number) => String(n).padStart(2, '0');
 ---
 
 <BaseLayout
   title="Projects"
   description="Projects by Jiayu (Jerry) Liu: Senju (agent swarm, hackathon winner), TriFallNet, AudioAware, topological data analysis, and hyperplane arrangements."
 >
-  <div class="container-x pt-14">
-    <SectionHeader as="h1" title="Projects" subtitle="Agent systems, ML research, assistive hardware, and mathematics." />
-
-    <div class="reveal mb-12 flex flex-wrap gap-x-5 gap-y-2 text-[0.92rem]" role="group" aria-label="Filter projects by category">
-      {
-        filters.map((f, i) => (
-          <button
-            type="button"
-            data-filter={f.id}
-            aria-pressed={i === 0 ? 'true' : 'false'}
-            class="filter-btn text-muted underline-offset-[6px] transition-colors hover:text-ink aria-pressed:text-ink aria-pressed:underline aria-pressed:decoration-accent-400"
-          >
-            {f.label}
-          </button>
-        ))
-      }
-    </div>
-
-    <div class="grid gap-x-8 gap-y-14 md:grid-cols-2">
-      <div class="project-item reveal md:col-span-2" data-categories={lead.data.categories.join(' ')}>
-        <ProjectCard
-          slug={lead.id}
-          title={lead.data.title}
-          summary={lead.data.summary}
-          dates={lead.data.dates}
-          thumbnail={lead.data.thumbnail}
-          award={lead.data.award}
-          size="wide"
-        />
-      </div>
-      {
-        rest.map((p, i) => (
-          <div class="project-item reveal" data-categories={p.data.categories.join(' ')} style={`--delay: ${(i % 2) * 80}ms`}>
-            <ProjectCard
-              slug={p.id}
-              title={p.data.title}
-              summary={p.data.summary}
-              dates={p.data.dates}
-              thumbnail={p.data.thumbnail}
-              award={p.data.award}
-            />
-          </div>
-        ))
-      }
-    </div>
-
-    <p id="empty-state" class="hidden py-12 text-center text-muted">No projects in this category yet.</p>
+  <h1 class="page-title" data-scramble-load>Projects</h1>
+  <div class="page-intro">
+    <p class="mono dim rv">{projects.length} projects</p>
+    <p class="lead rv" style="--d: 80ms">
+      Agent systems, machine-learning research, assistive hardware, and mathematics.
+    </p>
   </div>
 
-  <script>
-    const buttons = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
-    const items = document.querySelectorAll<HTMLElement>('.project-item');
-    const empty = document.getElementById('empty-state');
-    buttons.forEach((btn) =>
-      btn.addEventListener('click', () => {
-        const f = btn.dataset.filter ?? 'all';
-        buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
-        let visible = 0;
-        items.forEach((item) => {
-          const show = f === 'all' || (item.dataset.categories ?? '').split(' ').includes(f);
-          item.classList.toggle('hidden', !show);
-          if (show) visible++;
-        });
-        empty?.classList.toggle('hidden', visible > 0);
-      }),
-    );
-  </script>
+  <section class="sec">
+    <h2 class="sec-label mono"><span class="idx">01</span><span data-scramble>Index</span></h2>
+    <div class="sec-body">
+      <ul class="rows-big">
+        {
+          projects.map((p, i) => (
+            <li class="rv">
+              <a href={`/projects/${p.id}`} class="row-big" data-img={p.data.thumbnail}>
+                <span class="mono dim">{pad(i + 1)}</span>
+                <span class="main">
+                  <span class="title">{p.data.title.split(':')[0]}</span>
+                  <span class="tag">
+                    {p.data.award && <span class="mono accent mr-2">Winner</span>}
+                    {p.data.tagline}
+                  </span>
+                </span>
+                <span class="mono dim">{year(p.data.dates)}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
 </BaseLayout>
