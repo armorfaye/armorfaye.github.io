@@ -1,0 +1,66 @@
+---
+title: 'Marin Autoresearch: Automating Architecture Improvement'
+summary: 'An agent loop that proposes architecture changes for Marin’s Belay model, screens them on TPU, sends the promising ones to Belay’s 8×H100 speedrun, and climbs the winners up the scaling ladder.'
+tagline: 'An agent loop that screens architecture ideas on TPU and ships the winners to Marin’s H100 speedrun and scaling ladder.'
+abstract: 'Marin Belay is Marin’s open process for improving its model architecture: anyone can propose an idea, and Belay tests it on 8×H100 and then on a ladder of larger models. I built a loop that does the proposing. Agents read papers and past results, implement each idea, screen it cheaply on TPU, and post only the ones likely to win on H100.'
+categories: ['ai-ml', 'software-systems']
+tags: ['LLMs', 'Architecture', 'Autoresearch', 'Agents', 'TPU', 'Scaling']
+role: 'Designed and run the loop'
+dates: 'Nov 2026 – present'
+featured: true
+order: 0.5
+thumbnail: '/images/projects/marin-autoresearch.svg'
+stack: ['JAX', 'TPU v4-32', '8×H100', 'Claude Code']
+results:
+  - 'Two equal-time wins on Belay’s H100 speedrun, from over 300 TPU screening runs.'
+  - 'Best find: character n-gram embeddings folded into the input table (−0.0131 Paloma loss at equal time).'
+learned:
+  - 'A cheap screen is only useful once it is calibrated against the expensive test.'
+  - 'How an idea is implemented can decide whether it wins.'
+  - 'Gains shrink with scale, so a small-model win is a hypothesis, not a result.'
+links:
+  - { label: 'Marin', url: 'https://marin.community', type: 'site' }
+---
+
+## The problem
+
+There are far more plausible architecture ideas than anyone can test, and most
+of them fail. Testing one is a fixed routine: implement it, train a small model
+against a control, read the curves, decide what next. That routine is regular
+enough for agents to run. The hard part is making a cheap test predict the
+expensive one.
+
+[Marin](https://marin.community)’s **Belay** process supplies the expensive
+test. Each proposed idea trains for 480 seconds on 8×H100 against the current
+recipe and is judged at **equal time**, so a slower idea trains on fewer tokens.
+Winners then move up a ladder of larger models.
+
+## The loop
+
+| Stage | Where | Time | Question |
+|---|---|---|---|
+| Screen | TPU v4-32 | ~12 min | Does it lower loss at all? |
+| Speedrun | Belay, 8×H100 | 1–2 h | Does it win at equal time? |
+| Ladder | Belay, d512 → d1280 | days | Does the gain hold with scale? |
+
+1. **Propose.** An agent writes each idea as a card: the mechanism, the evidence
+   behind it, its cost, and a stop line it must beat partway through training.
+   Cards are checked against Belay’s registry, so tested ideas are never repeated.
+2. **Implement.** The idea becomes a default-off flag, so the control is the same
+   code with the flag off. Tests confirm the flag-off model is unchanged and no
+   future tokens leak.
+3. **Screen.** A short TPU run against the control. Runs that miss their stop
+   line are killed early.
+4. **Price.** A TPU gain is discounted by its expected H100 slowdown. Only ideas
+   that should still win at equal time are posted.
+5. **Climb.** Belay runs the speedrun. Wins go up the ladder, and every result
+   comes back to recalibrate the screen.
+
+## Keeping the screen honest
+
+The loop is only as good as the screen’s ability to predict H100. Every Belay
+result is compared with its TPU screen, and the pricing is re-fitted from those
+pairs. This caught a real problem: an n-gram feature that looked strong on TPU
+ran 9% slower on H100 and lost. The agents traced the cost to how the feature
+was built, rebuilt it inside the embedding table, and the same idea became the
+loop’s best win.

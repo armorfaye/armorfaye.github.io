@@ -17,6 +17,7 @@ Each project in `src/content/projects/` points to a thumbnail via its
 illustrations that match the site theme:
 
 - `senju.svg`
+- `marin-autoresearch.svg`
 - `trifallnet.svg`
 - `audio-aware.svg`
 - `tda-alzheimers.svg`

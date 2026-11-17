@@ -10,6 +10,10 @@ export default defineConfig({
   site: 'https://armorfaye.github.io',
   base: '/',
   integrations: [mdx(), sitemap()],
+  // Light code blocks to match the paper background.
+  markdown: {
+    shikiConfig: { theme: 'github-light' },
+  },
   // Old URLs: the papers page, and the experience page (now covered by the CV).
   redirects: {
     '/writing': '/research',

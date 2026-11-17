@@ -496,6 +496,7 @@ a:hover .arr {
   color: var(--color-ink);
 }
 .prose-site pre {
+  background-color: var(--color-raised) !important;
   margin: 24px 0;
   overflow-x: auto;
   border: 1px solid var(--color-line);
