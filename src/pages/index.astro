@@ -19,18 +19,19 @@ const ext = { target: '_blank', rel: 'noopener noreferrer' };
 const year = (d: string) => d.match(/\d{4}(?!.*\d{4})/)?.[0] ?? d;
 const pad = (n: number) => String(n).padStart(2, '0');
 
+const ul = (href: string, text: string) =>
+  `<a href="${href}" class="ul" target="_blank" rel="noopener noreferrer">${text}</a>`;
+
 const now = [
   {
     title: 'Priced-guidance RL',
     where: 'Stanford NLP · Percy Liang’s group',
-    body: 'A guidance-based pipeline for data creation and RL environment generation, and the next Marin pretraining architecture (~600B).',
-    href: 'https://marin.community',
+    body: `A guidance-based pipeline for data creation and RL environment generation, and the next ${ul('https://marin.community', 'Marin')} pretraining architecture (~600B).`,
   },
   {
-    title: 'Efficient inference for NCM',
+    title: 'Efficient decoding with NCM',
     where: 'Hazy Research · with Hermann Kumbong',
-    body: 'Speeding up Next-Concept Modeling, which writes text coarse-to-fine and in parallel instead of one token at a time.',
-    href: 'https://hazyresearch.stanford.edu/blog/2026-10-12-ncm',
+    body: `Speeding up ${ul('https://hazyresearch.stanford.edu/blog/2026-10-12-ncm', 'Next-Concept Modeling')}, which writes text coarse-to-fine and in parallel instead of one token at a time.`,
   },
 ];
 ---
@@ -94,13 +95,11 @@ const now = [
         {
           now.map((n) => (
             <li class="rv">
-              <a href={n.href} {...ext} class="now-item">
-                <span class="now-title">
-                  {n.title} <span class="arr">↗</span>
-                </span>
+              <div class="now-item">
+                <span class="now-title">{n.title}</span>
                 <span class="mono dim">{n.where}</span>
-                <span class="now-body">{n.body}</span>
-              </a>
+                <span class="now-body" set:html={n.body} />
+              </div>
             </li>
           ))
         }
@@ -297,9 +296,6 @@ const now = [
     line-height: 1.15;
     color: var(--color-ink);
     transition: color 0.2s;
-  }
-  .now-item:hover .now-title {
-    color: var(--accent);
   }
   .now-body {
     margin-top: 6px;

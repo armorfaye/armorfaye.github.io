@@ -1,66 +1,194 @@
 ---
-title: 'Marin Autoresearch: Automating Architecture Improvement'
-summary: 'An agent loop that proposes architecture changes for Marin’s Belay model, screens them on TPU, sends the promising ones to Belay’s 8×H100 speedrun, and climbs the winners up the scaling ladder.'
-tagline: 'An agent loop that screens architecture ideas on TPU and ships the winners to Marin’s H100 speedrun and scaling ladder.'
-abstract: 'Marin Belay is Marin’s open process for improving its model architecture: anyone can propose an idea, and Belay tests it on 8×H100 and then on a ladder of larger models. I built a loop that does the proposing. Agents read papers and past results, implement each idea, screen it cheaply on TPU, and post only the ones likely to win on H100.'
+title: 'Marin Autoresearch: What Scales and What Doesn’t'
+summary: 'Notes from running an agent loop that proposes, implements and screens model changes for Marin’s Belay process. The optimizer ideas held up as training grew. The architecture ideas mostly faded, and working out why changed how I think about automating this kind of research.'
+tagline: 'An agent loop for Marin’s architecture search: optimizer wins held up, architecture wins faded with scale.'
+abstract: 'Marin Belay is Marin’s open process for improving its model: anyone can propose a change, Belay tests it on 8×H100, and the winners climb a ladder of larger models. I built an agent loop that does the proposing. It found several wins on Belay. The optimizer changes held up as training got longer. Most of the architecture changes faded as the models got bigger. This post covers what that taught me about evaluation, implementation cost, robustness, and how to look for ideas that scale.'
 categories: ['ai-ml', 'software-systems']
-tags: ['LLMs', 'Architecture', 'Autoresearch', 'Agents', 'TPU', 'Scaling']
-role: 'Designed and run the loop'
+tags: ['LLMs', 'Architecture', 'Optimizers', 'Autoresearch', 'Agents', 'Scaling']
+role: 'Designed and ran the loop'
 dates: 'Nov 2026 – present'
 featured: true
 order: 0.5
 thumbnail: '/images/projects/marin-autoresearch.svg'
 stack: ['JAX', 'TPU v4-32', '8×H100', 'Claude Code']
 results:
-  - 'Two equal-time wins on Belay’s H100 speedrun, from over 300 TPU screening runs.'
-  - 'Best find: character n-gram embeddings folded into the input table (−0.0131 Paloma loss at equal time).'
+  - 'Several equal-time wins on Belay’s H100 speedrun, from both architecture and optimizer ideas.'
+  - 'A line of optimizer changes (MuonC with AdamC-style decay) that kept winning, with gains that held or grew as training ran longer.'
+  - 'A clear picture of why most architecture wins fade up the scaling ladder, and a revised loop built around that.'
 learned:
-  - 'A cheap screen is only useful once it is calibrated against the expensive test.'
-  - 'How an idea is implemented can decide whether it wins.'
-  - 'Gains shrink with scale, so a small-model win is a hypothesis, not a result.'
+  - 'Winning at the smallest rung is easy. Winning at the rung you actually care about is the real problem.'
+  - 'How an idea is implemented is part of the idea. Kernel work can’t be left out of the loop.'
+  - 'Ideas that fix a problem that gets worse with scale are the ones most likely to scale.'
 links:
   - { label: 'Marin', url: 'https://marin.community', type: 'site' }
 ---
 
-## The problem
+## The setup
 
-There are far more plausible architecture ideas than anyone can test, and most
-of them fail. Testing one is a fixed routine: implement it, train a small model
-against a control, read the curves, decide what next. That routine is regular
-enough for agents to run. The hard part is making a cheap test predict the
-expensive one.
+[Marin](https://marin.community)’s **Belay** process is an open queue for improving
+Marin’s model. You post an idea, Belay trains it on 8×H100 against the current
+recipe at a small width (d512), and judges it at **equal wall-clock time**: if
+your change makes each step slower, it gets fewer tokens. Ideas that win then go
+up a ladder of wider, deeper, longer-trained models.
 
-[Marin](https://marin.community)’s **Belay** process supplies the expensive
-test. Each proposed idea trains for 480 seconds on 8×H100 against the current
-recipe and is judged at **equal time**, so a slower idea trains on fewer tokens.
-Winners then move up a ladder of larger models.
+My loop sat in front of that queue. Agents read papers, past Belay results, and
+the training dynamics of our own runs. They wrote each idea up as a short card
+with a mechanism and a falsifier, implemented it behind a flag, and screened it
+on a TPU. The ones that looked like they would survive the H100 test got posted.
+Every Belay result came back into the loop to recalibrate the screen.
 
-## The loop
+I expected the hard part to be generating good ideas. It wasn’t. The hard part
+was knowing whether a win meant anything.
 
-| Stage | Where | Time | Question |
-|---|---|---|---|
-| Screen | TPU v4-32 | ~12 min | Does it lower loss at all? |
-| Speedrun | Belay, 8×H100 | 1–2 h | Does it win at equal time? |
-| Ladder | Belay, d512 → d1280 | days | Does the gain hold with scale? |
+## Where it worked: the optimizer
 
-1. **Propose.** An agent writes each idea as a card: the mechanism, the evidence
-   behind it, its cost, and a stop line it must beat partway through training.
-   Cards are checked against Belay’s registry, so tested ideas are never repeated.
-2. **Implement.** The idea becomes a default-off flag, so the control is the same
-   code with the flag off. Tests confirm the flag-off model is unchanged and no
-   future tokens leak.
-3. **Screen.** A short TPU run against the control. Runs that miss their stop
-   line are killed early.
-4. **Price.** A TPU gain is discounted by its expected H100 slowdown. Only ideas
-   that should still win at equal time are posted.
-5. **Climb.** Belay runs the speedrun. Wins go up the ladder, and every result
-   comes back to recalibrate the screen.
+The cleanest success was in the optimizer. One line of work started from a
+simple observation in our own runs: under Muon, the weight matrices “want” to
+grow early in training, but the recipe pins them at their initial size. Letting
+the radius move, with a decay that pulls it back (MuonC), and giving the
+router, head, and embeddings their own decoupled decay (AdamC), produced a series
+of wins on Belay’s H100 speedrun. Each follow-up improved on the last.
 
-## Keeping the screen honest
+What made this different from the architecture wins was how the gain behaved
+over time. The optimizer changes built their lead early and *kept* it through
+the end of training, and when we trained longer the gain held or grew. An
+optimizer change acts on every matrix in the model at every step. It doesn’t
+supply anything a bigger model would learn on its own, so there is no reason for
+scale to make it unnecessary.
 
-The loop is only as good as the screen’s ability to predict H100. Every Belay
-result is compared with its TPU screen, and the pricing is re-fitted from those
-pairs. This caught a real problem: an n-gram feature that looked strong on TPU
-ran 9% slower on H100 and lost. The agents traced the cost to how the feature
-was built, rebuilt it inside the embedding table, and the same idea became the
-loop’s best win.
+The first version of MuonC actually lost on H100. The diagnosis was useful: the
+weights grew to about three times the control’s size, which quietly cut the
+effective learning rate. The model led for most of the run and then lost in the
+anneal. Fixing the equilibrium, rather than tuning a number, is what turned it
+into a win.
+
+## Where it didn’t: architecture up the ladder
+
+The architecture side found real speedrun wins too: character n-gram rows folded
+into the input embedding, the output head’s rows reused as value embeddings,
+an exact-match copy pointer on the output. All of them won at d512 on H100.
+
+Then they went up the ladder, and almost all of them faded. Training the same
+d512 model for longer shrank every gain. Going wider was mixed. At the largest
+rung, nearly everything was noise.
+
+Looking across the registry, the pattern is consistent. Most of our wins were
+**crutches**: they handed the model something a larger or longer-trained model
+learns by itself, such as token identity, spelling, or n-gram statistics. A
+small model trained briefly benefits a lot from those hints. A big model already
+has them. The one class that held up best was computation over the context
+(copying from earlier in the document), and even that shrank at every rung.
+
+The uncomfortable conclusion is that **the loop was very good at optimizing
+for d512**. That is exactly the wrong target.
+
+## Evaluating end to end: is the change worth it?
+
+An autoresearch loop needs to answer one question: *is this change worth
+adding to the model?* A loss delta on one run doesn’t answer it. To answer it
+you need the whole chain:
+
+1. a cheap screen that is **calibrated** against the expensive test, not just correlated with it;
+2. an equal-time verdict, because a change that costs speed has to pay for it;
+3. evidence that the gain survives longer training and larger models;
+4. some sense of whether it will still be fast at the real training scale.
+
+The loop started out good at (1) and (2) and blind to (3) and (4). Our own
+“does the gain fade within the run” check didn’t help either. Ideas that held
+perfectly flat through a single run still vanished at the top of the ladder,
+because the fade comes from width, depth, and tokens per parameter, not from time
+within one schedule. No single-rung screen can see that.
+
+## Kernels are part of the idea
+
+Early on I pushed the loop away from kernel and systems work, on the grounds
+that it was harness tuning, not architecture. That turned out to be half wrong.
+
+The clearest case: the same n-gram feature was implemented two ways. The first
+version rebuilt a table every step and lost badly at equal time. The second
+folded the same rows into the existing embedding table and became our best
+speedrun result. The math was identical, and the implementation decided the
+verdict.
+
+So I now think an end-to-end loop has to own its kernels. If it doesn’t, it
+should at least accept roughly a **±10% margin in compute efficiency** when
+judging an idea, since a reasonable engineer could recover that much with a
+better implementation. Otherwise you throw out good ideas because of a slow
+first draft, and you keep cheap tricks that happen to fuse well on today’s
+hardware. It also cuts the other way: a TPU often underestimated what an idea
+would cost on H100, so pricing has to happen on the hardware that matters.
+
+## Looking for ideas that scale
+
+Once it was clear that the loop was overfitting to d512, the fix had to go into
+idea generation, not just into another filter at the end. The approach I moved
+to is closer to how people actually find ideas that scale:
+
+- **Diagnose the big model, not the small one.** Belay’s larger rung controls
+  are public. Look for things that get *worse* from d512 to d1280: gradients
+  that grow late, gates that saturate, routers that become unhealthy, data
+  domains that improve least with scale. An idea that fixes a problem growing
+  with scale should scale by construction.
+- **Avoid places where scale already helps.** If bigger models already learn
+  something well, an idea that supplies it is a crutch.
+- **Require a scaling argument.** Every card has to say what grows with width,
+  depth, or tokens that its mechanism serves. A separate critic agent argues
+  that the idea is redundant at the top rung, and cards that lose the argument
+  get marked “speedrun only.”
+- **Borrow evidence from larger runs.** Prefer mechanisms that have been
+  validated across a scale sweep elsewhere.
+
+I also tried building a cheap proxy for scale: shrinking the width, warm-starting
+from a longer-trained checkpoint, and using a deeper, narrower twin. The depth
+twin failed on the first idea I tried. Sixteen layers on their own did not
+reproduce the fade. That was a useful negative result, because it says the top
+rung changes in other ways too.
+
+## Robustness
+
+A win you can only reproduce on one seed, one base recipe, and one setting of a
+hyperparameter is not a win. Some lessons:
+
+- **Seed noise is about the size of the bar.** Small single-seed deltas are not
+  evidence, and a lucky control can make every idea look slightly worse (or
+  better) for a whole round.
+- **Some ideas survive recipe changes and some don’t.** Embedding tables and
+  logit caps kept their gains as the base recipe changed underneath them for
+  weeks. Attention temperature, router, and Muon tweaks mostly did not. Those
+  tend to be retunings of the current recipe, not new mechanisms.
+- **Prefer ideas that don’t need tuning.** For MuonC, adding feedback on the
+  norm level removed the need to hand-pick the decay strength. A change that
+  works across a range of settings is much more likely to transfer than one
+  that wins at a single swept value.
+
+## Dynamics change across scale
+
+The last lesson is that “scale” isn’t one axis. Going from Belay’s d1024 rung
+to d1280 changes the depth, quadruples the batch, lowers Adam’s β₂, changes
+the learning rate, and doubles the tokens, all at once. A fade there could come
+from any of those.
+
+Looking at the rung controls directly made the shift visible. Some symptoms
+grow steadily with width. For example, one normalization in the MLP input loses
+reach as the model widens, because the optimizer pins a small matrix at its
+initial size. Other things improve with scale, like the share of gradient going
+to the token embedding, and those are exactly where the crutches lived. Late in
+training, the routed experts turn out to be nearly the only weights still
+learning. That suggests capacity ideas behave very differently from the token
+tricks.
+
+This changes what an idea needs to be. An idea that compensates for the small
+recipe, such as an effective learning-rate cut disguised as an architecture
+change, disappears once the ladder retunes the learning rate per rung. An idea
+that addresses a dynamic that gets worse with scale has a chance.
+
+## Where this leaves me
+
+Agents are already good at the inner loop of architecture research: proposing,
+implementing, testing, and reading the results. What they are not good at, unless
+you build it in, is caring about the right scale. The optimizer work scaled because
+it acted on the whole model and fixed a real mismatch in the training dynamics.
+The architecture work mostly didn’t, because the loop rewarded whatever helped a
+small model most. The next version of the loop starts from the large model’s
+problems and works down, owns its implementations, and treats a d512 win as a
+hypothesis, not a result.
