@@ -1,10 +1,10 @@
 ---
 title: 'Senju 千手: A Thousand Hands on Your Desktop'
-summary: 'A Mac app that runs a swarm of Claude computer-use agents, each with its own ghost cursor, in your real browser and apps while you keep working. A lead agent plans and replans, workers act through MCP, and every job ends with a retrospective saved as a reusable skill. Won the Ricursive Intelligence Hackathon.'
-tagline: 'A swarm of computer-use agents, each with its own cursor, working in your real apps while you keep working.'
-abstract: 'Senju (千手, “a thousand hands”) turns one prompt into a coordinated swarm of computer-use agents. You type a goal into a bar at the top of the screen. A lead agent splits it into tasks, spawns workers, and watches their progress. Each worker drives your real Mac through MCP servers (Playwright for the browser, a filesystem server, and Cua Driver for desktop apps), and a ghost cursor shows where it is working. Your own mouse and keyboard stay free the whole time. You can interrupt any agent, take over its window, or hand it back, and anything sent in your name waits for your approval.'
+summary: 'A Mac app that runs a self-improving swarm of Claude computer-use agents, each with its own ghost cursor, in your real browser and apps while you keep working. Every job ends with a retrospective saved as a reusable skill, so the swarm gets better at your work over time. Won the Ricursive Intelligence Hackathon.'
+tagline: 'A self-improving swarm of computer-use agents, each with its own cursor, working in your real apps while you keep working.'
+abstract: 'Senju (千手, “a thousand hands”) turns one prompt into a coordinated swarm of computer-use agents, and it is a self-improving agent swarm: after every job it writes down what worked as a reusable skill, so the next job starts smarter than the last. You type a goal into a bar at the top of the screen. A lead agent splits it into tasks, spawns workers, and watches their progress. Each worker drives your real Mac through MCP servers (Playwright for the browser, a filesystem server, and Cua Driver for desktop apps), and a ghost cursor shows where it is working. Your own mouse and keyboard stay free the whole time. You can interrupt any agent, take over its window, or hand it back, and anything sent in your name waits for your approval.'
 categories: ['ai-ml', 'software-systems']
-tags: ['Agents', 'Computer Use', 'Claude', 'MCP', 'Electron', 'Multiplayer']
+tags: ['Agents', 'Self-Improvement', 'Computer Use', 'Claude', 'MCP', 'Electron', 'Multiplayer']
 role: 'Co-creator'
 dates: '2026'
 featured: true
@@ -14,14 +14,14 @@ thumbnail: '/images/projects/senju.svg'
 stack: ['Node.js', 'Electron', 'Claude API', 'MCP', 'Playwright', 'Cua Driver', 'Supabase', 'Fly.io']
 results:
   - 'Won the Ricursive Intelligence Hackathon.'
+  - 'The swarm improves itself: after each job, the lead writes a retrospective and saves it as a plain-Markdown skill that later jobs load and build on.'
   - 'A lead agent plans, spawns workers, waits on their events, and replans or stops them as the job changes.'
   - 'Workers run in your real browser and desktop apps, each shown by its own ghost cursor, without taking your mouse or keyboard.'
-  - 'Team mode shares one session across several Macs, with per-session permission from each Mac’s owner.'
-  - 'After each job, the lead writes a retrospective and saves it as a plain-Markdown skill that later jobs reuse.'
+  - 'Team mode shares one session across several Macs, and skills learned on one Mac are shared with the whole team.'
 learned:
   - 'With many agents running at once, the hard problem is coordination: who owns which window, when to wait, and when to replan.'
   - 'Users trust agents they can interrupt. Approval gates and visible cursors mattered as much as raw capability.'
-  - 'Saving what worked as editable Markdown skills is a simple, inspectable kind of self-improvement.'
+  - 'Self-improvement does not need retraining. Saving what worked as editable Markdown skills is simple, inspectable, and compounds with every job.'
 links:
   - { label: 'Website', url: 'https://senju-website.vercel.app', type: 'site' }
 ---
@@ -33,7 +33,24 @@ keyboard, and you wait. Senju runs **many agents at once next to you**. Each
 one has its own cursor and its own window, and you keep working the whole time.
 
 Press <kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>Space</kbd>, type a goal, and a swarm goes
-to work.
+to work. And the swarm **improves itself**: every job it finishes leaves behind
+a skill that makes the next one faster and more reliable.
+
+## A self-improving swarm
+
+Senju learns from its own work, without any retraining:
+
+1. **Retrospective.** When a job ends, the lead agent reviews what happened:
+   which steps worked, where workers got stuck, and what it had to replan.
+2. **Skill.** It saves those lessons as a **skill**, a plain Markdown file you
+   can read, edit, or delete.
+3. **Reuse.** The next similar job starts from that skill, so the lead plans
+   with what the swarm already knows instead of rediscovering it.
+
+Every job adds to the swarm’s skills, so the more you use it, the better it
+gets at your work. Because skills are ordinary files, the improvement stays
+inspectable: you can see exactly what it learned and correct it. In a team,
+skills are shared across everyone’s Macs and every revision is kept.
 
 ## How it works
 
@@ -68,13 +85,6 @@ In team mode, one agent can read on your Mac and write on a teammate’s. Its
 cursor docks on every screen while it rests and moves to whichever screen it is
 called to. Each owner grants permission per session, requests only go to the
 person they concern, and shared knowledge is credited to its source.
-
-## It gets better at your work
-
-When a job ends, the lead writes a short retrospective and saves what it learned
-as a **skill**, a plain Markdown file you can read, edit, or delete. The next
-similar job starts from that file. In a team, skills are shared and every
-revision is kept.
 
 ## Under the hood
 
