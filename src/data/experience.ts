@@ -44,7 +44,7 @@ export const experienceSections: ExperienceSection[] = [
       {
         org: 'Hazy Research · Stanford',
         role: 'Researcher, Speculative Decoding for Next-Concept Models',
-        dates: '2026 – Present',
+        dates: 'Oct 2026 – Present',
         location: 'Stanford, CA',
         current: true,
         highlight: true,
